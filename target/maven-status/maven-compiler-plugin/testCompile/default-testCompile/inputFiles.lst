@@ -5,3 +5,4 @@
 /home/julio/github/ferbo-tools/src/test/java/com/ferbo/tools/exception/ToolExceptionTest.java
 /home/julio/github/ferbo-tools/src/test/java/com/ferbo/tools/validation/ValidatorTest.java
 /home/julio/github/ferbo-tools/src/test/java/com/ferbo/tools/exception/BussinesExceptionTest.java
+/home/julio/github/ferbo-tools/src/test/java/com/ferbo/tools/validation/TextValidatorTest.java
