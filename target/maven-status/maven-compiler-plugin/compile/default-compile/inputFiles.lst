@@ -1,6 +1,7 @@
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/exception/BussinesException.java
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/exception/ToolException.java
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/exception/SystemException.java
+/home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/validation/Validator.java
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/exception/RuleException.java
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/validation/Notification.java
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/exception/ValidationException.java
