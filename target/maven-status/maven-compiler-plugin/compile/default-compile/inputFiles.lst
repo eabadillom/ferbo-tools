@@ -5,5 +5,6 @@
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/exception/RuleException.java
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/validation/IntegerValidator.java
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/validation/Notification.java
+/home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/validation/MonetaryValidator.java
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/exception/ValidationException.java
 /home/julio/github/ferbo-tools/src/main/java/com/ferbo/tools/validation/TextValidator.java
