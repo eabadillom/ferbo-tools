@@ -2,7 +2,6 @@ package com.ferbo.tools.value.money;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.Bidi;
 import java.util.Currency;
 import java.util.Objects;
 
@@ -10,7 +9,8 @@ import com.ferbo.tools.exception.BussinesException;
 import com.ferbo.tools.exception.ValidationException;
 
 /**
- * Value Object que representa una cantidad monetaria segura.
+ * Value Object que representa una cantidad monetaria segura e inmutable.
+ * Garantiza que el monto siempre tenga la escala correcta según la moneda. 
  * 
  * Características:
  * - Inmutable 
@@ -23,13 +23,14 @@ import com.ferbo.tools.exception.ValidationException;
  * - Negativos
  * - Cero
  */
-public final class Money {
+public final class Money implements Comparable<Money>{
 
     private final BigDecimal amount;
     private final Currency currency;
 
     /**
-     *  Constructor principal. 
+     *  Constructor principal.
+     *  Aplica Validaciones y redondeo automático.
      * 
      * @param amount Cantidad monetaria
      * @param currency Moneda
@@ -37,10 +38,8 @@ public final class Money {
     public Money (BigDecimal amount, Currency currency) {
         validate(amount, currency);
 
-        int scale = currency.getDefaultFractionDigits();
-
         this.currency = currency;
-        this.amount = amount.setScale(scale, RoundingMode.HALF_UP);
+        this.amount = CurrencyUtils.round(amount, currency);
     }
 
     /**
@@ -61,9 +60,7 @@ public final class Money {
      */
     public Money add(Money other) {
         validateSameCurrency(other);
-
-        BigDecimal result = this.amount.add(other.amount);
-        return new Money(result, this.currency);
+        return new Money(this.amount.add(other.amount), this.currency);
     }
 
     /**
@@ -71,9 +68,7 @@ public final class Money {
      */
     public Money substract(Money other) {
         validateSameCurrency(other);
-
-        BigDecimal result = this.amount.subtract(other.amount);
-        return new Money(result, this.currency);
+        return new Money(this.amount.subtract(other.amount), this.currency);
     }
 
     /**
@@ -117,6 +112,15 @@ public final class Money {
         if(!this.currency.equals(other.currency)){
             throw new BussinesException("Las monedas deben ser iguales para operar");
         }
+    }
+
+    /**
+     * Compara dos valores monetarios.
+     */
+    @Override
+    public int compareTo(Money other) {
+        validateSameCurrency(other);
+        return this.amount.compareTo(other.amount);
     }
 
     /**
@@ -164,7 +168,7 @@ public final class Money {
 
     Money money = (Money) o;
 
-    return Objects.equals(amount, money.amount) && Objects.equals(currency, money.currency);
+    return amount.compareTo(money.amount) == 0 && currency.equals(money.currency);
    }
 
    /**
@@ -172,7 +176,7 @@ public final class Money {
     */
    @Override 
    public int hashCode() {
-        return Objects.hash(amount, currency);
+        return Objects.hash(amount.stripTrailingZeros(), currency);
    }
 
    /**
@@ -180,6 +184,6 @@ public final class Money {
     */
    @Override
    public String toString(){
-        return currency.getCurrencyCode() + " " + amount;
+        return CurrencyUtils.format(this);
    }
 }
