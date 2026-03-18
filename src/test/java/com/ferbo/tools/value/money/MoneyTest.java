@@ -1,6 +1,7 @@
 package com.ferbo.tools.value.money;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -53,6 +54,17 @@ public class MoneyTest {
     @Test(expected = ValidationException.class)
     public void shouldFailWhenCurrencyIsNull() {
         new Money(new BigDecimal("100"), null);
+    }
+
+    /**
+     * Debe aplicar redondeo correcto segun la momenda
+     */
+    @Test
+    public void shouldApplyRoundingCorrectly() {
+        Money money = new Money(new BigDecimal("100.123"), mxn);
+
+        // MXN normalmente usa 2 decimales
+        assertEquals(new BigDecimal("100.12"), money.getAmount());
     }
 
     /**
@@ -182,6 +194,19 @@ public class MoneyTest {
     }
 
     /**
+     * Debe comparar correctamente dos montos
+     */
+    @Test
+    public void shouldCompareMoneyCorrectly() {
+        Money m1 = new Money(new BigDecimal("100.00"), mxn);
+        Money m2 = new Money(new BigDecimal("200.00"), mxn);
+
+        assertTrue(m1.compareTo(m2) < 0);
+        assertTrue(m2.compareTo(m1) > 0);
+        assertFalse(m1.compareTo(m2) == 0);
+    }
+
+    /**
      * equals debe funcionar correctamente.
      */
     @Test
@@ -197,8 +222,8 @@ public class MoneyTest {
      */
     @Test
     public void shouldReturnCorrectToString() {
-        Money money = new Money(new BigDecimal("100.00"), mxn);
+        Money money = new Money(new BigDecimal("1000.00"), mxn);
 
-        assertEquals("MXN 100.00", money.toString());
+        assertEquals("MXN $1,000.00", money.toString());
     }
 }

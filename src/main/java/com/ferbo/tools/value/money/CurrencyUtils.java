@@ -69,7 +69,7 @@ public final class CurrencyUtils {
         formatter.setMinimumFractionDigits(currency.getDefaultFractionDigits());
         formatter.setMaximumFractionDigits(currency.getDefaultFractionDigits());
 
-        return formatter.format(amount);
+        return currency.getCurrencyCode() + " " + formatter.format(amount);
     }
 
     /**
