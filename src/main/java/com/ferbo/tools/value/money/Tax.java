@@ -27,7 +27,7 @@ public final class Tax {
      */
     public Tax(BigDecimal rate) {
         validate(rate);
-        this.rate = rate;
+        this.rate = rate.stripTrailingZeros();;
     }
 
     /**
@@ -35,7 +35,7 @@ public final class Tax {
      */
     private void validate(BigDecimal rate) {
         if (rate == null) {
-            throw new ValidationException("La tasa del impuesto no pude ser nula");
+            throw new ValidationException("La tasa del impuesto no puede ser nula");
         }
 
         if (rate.compareTo(BigDecimal.ZERO) < 0) {
@@ -80,6 +80,16 @@ public final class Tax {
     }
 
     /**
+     * Convierte el valor de 'rate' a porcentaje.
+     * Por ejemplo, si rate = 0.25, devuelve 25.
+     * 
+     * @return el valor de rate multiplicado por 100
+     */
+    public BigDecimal asPercentage() {
+        return rate.multiply(new BigDecimal("100"));
+    }
+
+    /**
      * equals basado en la tasa.
      */
     @Override
@@ -88,7 +98,7 @@ public final class Tax {
         if (!(o instanceof Tax)) return false;
 
         Tax tax = (Tax) o;
-        return Objects.equals(rate, tax.rate);
+        return rate.compareTo(tax.rate) == 0;
     }
 
     /**
@@ -96,7 +106,7 @@ public final class Tax {
      */
     @Override 
     public int hashCode() {
-        return Objects.hash(rate);
+        return Objects.hash(rate.stripTrailingZeros());
     }
 
     /**
@@ -106,6 +116,7 @@ public final class Tax {
     public String toString(){
         return "Tax{" +
                "rate=" + rate +
+               " (" + asPercentage() + "%)" +
                '}';
     }
 }

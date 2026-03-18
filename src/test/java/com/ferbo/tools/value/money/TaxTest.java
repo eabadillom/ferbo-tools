@@ -117,6 +117,13 @@ public class TaxTest {
         assertEquals(t1, t2);
     }
 
+    @Test
+    public void shouldConvertRateToPercentage() {
+        Tax tax = new Tax(new BigDecimal("0.25"));
+        BigDecimal result = tax.asPercentage();
+        assertEquals(new BigDecimal("25.00"), result);
+    }
+
     /**
      * toString debe devolver información útil.
      */

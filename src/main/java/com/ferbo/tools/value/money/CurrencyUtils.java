@@ -31,7 +31,7 @@ public final class CurrencyUtils {
         if (currency == null) {
             throw new ToolException("La moneda no puede ser nula");
         }
-        return currency.getDefaultFractionDigits();
+        return Math.max(currency.getDefaultFractionDigits(), 0);
     }
 
     /**
@@ -43,7 +43,7 @@ public final class CurrencyUtils {
      */
     public static BigDecimal round(BigDecimal amount, Currency currency) {
         if (amount == null) {
-            throw new ToolException("EL monto no puede ser nulo.");
+            throw new ToolException("El monto no puede ser nulo.");
         }
         int scale = getScale(currency);
         return amount.setScale(scale, RoundingMode.HALF_UP);
@@ -80,7 +80,7 @@ public final class CurrencyUtils {
      * @return Money seguro
      */
     public static Money safeMoney(BigDecimal amount, Currency currency) {
-        BigDecimal rounded = round(amount, currency);
-        return new Money(rounded, currency);
+        // Solo delega al constructor, que ya valida y redondea
+        return new Money(amount, currency);
     }
 }

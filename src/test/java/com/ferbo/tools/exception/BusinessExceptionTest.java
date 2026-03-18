@@ -7,12 +7,12 @@ import org.junit.Test;
 /**
  * Pruebas unitarias para BussinesException.
  */
-public class BussinesExceptionTest {
+public class BusinessExceptionTest {
 
     @Test
     public void debeCrearExcepcionConMensaje(){
         
-        BussinesException ex = new BussinesException("Regla de negocio violada");
+        BusinessException ex = new BusinessException("Regla de negocio violada");
 
         assertEquals("Regla de negocio violada", ex.getMessage());
     }
@@ -21,7 +21,7 @@ public class BussinesExceptionTest {
     public void debeCrearExcepcionConCausa() {
         RuntimeException causa = new RuntimeException("error interno");
 
-        BussinesException ex = new BussinesException("Error de negocio", causa);
+        BusinessException ex = new BusinessException("Error de negocio", causa);
 
         assertEquals("Error de negocio", ex.getMessage());
         assertEquals(causa, ex.getCause());

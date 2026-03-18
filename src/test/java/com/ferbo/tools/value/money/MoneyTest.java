@@ -3,6 +3,7 @@ package com.ferbo.tools.value.money;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ import java.util.Currency;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ferbo.tools.exception.BussinesException;
+import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.ValidationException;
 
 /**
@@ -84,7 +85,7 @@ public class MoneyTest {
     /**
      * Debe fallar al sumar monedas diferentes.
      */
-    @Test (expected = BussinesException.class)
+    @Test (expected = BusinessException.class)
     public void shouldFailWhenAddDifferentCurrencies() {
         Money m1 = new Money(new BigDecimal("100.00"), mxn);
         Money m2 = new Money(new BigDecimal("50.00"), usd);
@@ -100,7 +101,7 @@ public class MoneyTest {
         Money m1 = new Money(new BigDecimal("100.00"), mxn);
         Money m2 = new Money(new BigDecimal("30.00"), mxn);
 
-        Money result = m1.substract(m2);
+        Money result = m1.subtract(m2);
 
         assertEquals(new BigDecimal("70.00"), result.getAmount());
     }
@@ -113,7 +114,7 @@ public class MoneyTest {
         Money m1 = new Money(new BigDecimal("50.00"), mxn);
         Money m2 = new Money(new BigDecimal("100.00"), mxn);
 
-        Money result = m1.substract(m2);
+        Money result = m1.subtract(m2);
 
         assertTrue(result.isNegative());
         assertEquals(new BigDecimal("-50.00"), result.getAmount());
@@ -156,7 +157,7 @@ public class MoneyTest {
     /**
      * Debe fallar al dividir entre cero.
      */
-    @Test(expected = BussinesException.class)
+    @Test(expected = BusinessException.class)
     public void shouldFailWhenDivideByZero() {
         Money money = new Money(new BigDecimal("100.00"), mxn);
 
@@ -204,6 +205,42 @@ public class MoneyTest {
         assertTrue(m1.compareTo(m2) < 0);
         assertTrue(m2.compareTo(m1) > 0);
         assertFalse(m1.compareTo(m2) == 0);
+    }
+
+    @Test
+    public void shouldNegateAmountAndKeepCurrency() {
+        Money original = new Money(new BigDecimal("100.00"), usd);
+
+        Money result = original.negate();
+
+        // Verifica que el monto se invierte
+        assertEquals(new BigDecimal("-100.00"), result.getAmount());
+
+        // Verifica que la moneda se mantiene
+        assertEquals(usd, result.getCurrency());
+
+        // Verificar que es una nueva instancia
+        assertNotSame(original, result);
+    }
+
+    @Test
+    public void shouldNegativaAmountToPositive() {
+        Money orignal = new Money(new BigDecimal("-50.00"), mxn);
+
+        Money result = orignal.negate();
+
+        assertEquals(new BigDecimal("50.00"), result.getAmount());
+        assertEquals(mxn, result.getCurrency());
+    }
+
+    @Test
+    public void shouldNegateZero() {
+        Money original = new Money(BigDecimal.ZERO, mxn);
+
+        Money result = original.negate();
+
+        assertEquals(new BigDecimal("0.00"), result.getAmount());
+        assertEquals(mxn, result.getCurrency());
     }
 
     /**

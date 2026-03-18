@@ -5,15 +5,15 @@ import java.math.RoundingMode;
 import java.util.Currency;
 import java.util.Objects;
 
-import com.ferbo.tools.exception.BussinesException;
+import com.ferbo.tools.exception.BusinessException;
 import com.ferbo.tools.exception.ValidationException;
 
 /**
  * Value Object que representa una cantidad monetaria segura e inmutable.
- * Garantiza que el monto siempre tenga la escala correcta según la moneda. 
+ * Garantiza que el monto siempre tenga la escala correcta según la moneda.
  * 
  * Características:
- * - Inmutable 
+ * - Inmutable
  * - Precio (usa BigDecimal)
  * - Seguro en operaciones
  * - Dependiente de la moneda
@@ -23,19 +23,19 @@ import com.ferbo.tools.exception.ValidationException;
  * - Negativos
  * - Cero
  */
-public final class Money implements Comparable<Money>{
+public final class Money implements Comparable<Money> {
 
     private final BigDecimal amount;
     private final Currency currency;
 
     /**
-     *  Constructor principal.
-     *  Aplica Validaciones y redondeo automático.
+     * Constructor principal.
+     * Aplica Validaciones y redondeo automático.
      * 
-     * @param amount Cantidad monetaria
+     * @param amount   Cantidad monetaria
      * @param currency Moneda
      */
-    public Money (BigDecimal amount, Currency currency) {
+    public Money(BigDecimal amount, Currency currency) {
         validate(amount, currency);
 
         this.currency = currency;
@@ -45,7 +45,7 @@ public final class Money implements Comparable<Money>{
     /**
      * Método de validación interna.
      */
-    private void validate(BigDecimal amount, Currency currency){
+    private void validate(BigDecimal amount, Currency currency) {
         if (amount == null) {
             throw new ValidationException("El monto no puede ser nulo");
         }
@@ -66,7 +66,7 @@ public final class Money implements Comparable<Money>{
     /**
      * Resta dos valores monetarios.
      */
-    public Money substract(Money other) {
+    public Money subtract(Money other) {
         validateSameCurrency(other);
         return new Money(this.amount.subtract(other.amount), this.currency);
     }
@@ -76,7 +76,7 @@ public final class Money implements Comparable<Money>{
      */
     public Money multiply(BigDecimal factor) {
         if (factor == null) {
-            throw new  ValidationException("El factor no puede ser nulo.");
+            throw new ValidationException("El factor no puede ser nulo");
         }
 
         BigDecimal result = this.amount.multiply(factor);
@@ -86,18 +86,18 @@ public final class Money implements Comparable<Money>{
     /**
      * Divide el monto por un divisor.
      */
-    public Money divide(BigDecimal divisor){
+    public Money divide(BigDecimal divisor) {
         if (divisor == null) {
-            throw new ValidationException("EL divisor no puede ser nulo.");
+            throw new ValidationException("El divisor no puede ser nulo");
         }
 
         if (BigDecimal.ZERO.compareTo(divisor) == 0) {
-            throw new BussinesException("No se puede dividir entre cero");
+            throw new BusinessException("No se puede dividir entre cero");
         }
 
-        int scale = currency.getDefaultFractionDigits();
+        // Escala alta temporal para evitar pérdida de precisión
+        BigDecimal result = this.amount.divide(divisor, 10, RoundingMode.HALF_UP);
 
-        BigDecimal result = this.amount.divide(divisor, scale, RoundingMode.HALF_UP);
         return new Money(result, this.currency);
     }
 
@@ -109,8 +109,8 @@ public final class Money implements Comparable<Money>{
             throw new ValidationException("El valor a operar no puede ser nulo");
         }
 
-        if(!this.currency.equals(other.currency)){
-            throw new BussinesException("Las monedas deben ser iguales para operar");
+        if (!this.currency.equals(other.currency)) {
+            throw new BusinessException("Las monedas deben ser iguales para operar");
         }
     }
 
@@ -132,58 +132,69 @@ public final class Money implements Comparable<Money>{
 
     /**
      * Obtiene la moneda
-    */
-   public Currency getCurrency() {
-    return currency;
-   }
+     */
+    public Currency getCurrency() {
+        return currency;
+    }
 
-   /**
-    * Indica si el valor es cero.
-    */
-   public boolean isZero(){
-    return BigDecimal.ZERO.compareTo(this.amount) == 0;
-   }
+    /**
+     * Indica si el valor es cero.
+     */
+    public boolean isZero() {
+        return BigDecimal.ZERO.compareTo(this.amount) == 0;
+    }
 
-   /**
-    * Indica si el valor es negativo.
-    */
-   public boolean isNegative() {
-    return this.amount.signum() < 0;
-   }
+    /**
+     * Indica si el valor es negativo.
+     */
+    public boolean isNegative() {
+        return this.amount.signum() < 0;
+    }
 
-   /**
-    * Indica si el valor es positivo.
-    */
-   public boolean isPositive() {
-    return this.amount.signum() > 0;
-   }
+    /**
+     * Indica si el valor es positivo.
+     */
+    public boolean isPositive() {
+        return this.amount.signum() > 0;
+    }
 
-   /**
-    * equals baso en monto y moneda.
-    */
-   @Override
-   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof Money)) return false;
+    /**
+     * Devuelve una nueva instancia de Money con el monto negado,
+     * es decir, invierte el signo del valor (positivo a negativo y viceversa),
+     * manteniendo la misma moneda.
+     */
+    public Money negate() {
+        return new Money(this.amount.negate(), this.currency);
+    }
 
-    Money money = (Money) o;
+    /**
+     * equals basado en monto y moneda.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Money))
+            return false;
 
-    return amount.compareTo(money.amount) == 0 && currency.equals(money.currency);
-   }
+        Money money = (Money) o;
 
-   /**
-    * hashCode consistente con equals.
-    */
-   @Override 
-   public int hashCode() {
+        return amount.compareTo(money.amount) == 0 && currency.equals(money.currency);
+    }
+
+    /**
+     * hashCode consistente con equals.
+     */
+    @Override
+    public int hashCode() {
         return Objects.hash(amount.stripTrailingZeros(), currency);
-   }
+    }
 
-   /**
-    * Representación en texto.
-    */
-   @Override
-   public String toString(){
+    /**
+     * Representación en texto.
+     */
+    @Override
+    public String toString() {
         return CurrencyUtils.format(this);
-   }
+    }
 }

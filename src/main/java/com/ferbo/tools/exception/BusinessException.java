@@ -23,14 +23,14 @@ package com.ferbo.tools.exception;
  * para informar al usuario o registrar la situación.
  * </p>
  */
-public class BussinesException extends ToolException {
+public class BusinessException extends ToolException {
 
     /**
      * Crea una excepcipon de negocio con un mensaje descriptivo.
      * 
      * @param message descripción del error de negocio
      */
-    public BussinesException(String message) {
+    public BusinessException(String message) {
         super(message);
     }
 
@@ -40,7 +40,7 @@ public class BussinesException extends ToolException {
      * @param mensaje descripción del error
      * @param cause excepción original
      */
-    public BussinesException(String message, Throwable cause){
+    public BusinessException(String message, Throwable cause){
         super(message, cause);
     }
 }

@@ -13,7 +13,7 @@ package com.ferbo.tools.exception;
  * complejas de los errores simples de negocio (BussinesException).
  * </p>
  */
-public class RuleException extends BussinesException {
+public class RuleException extends BusinessException {
 
     /**
      * Crea una excepción de la regla de negocio con mensaje descriptivo.
