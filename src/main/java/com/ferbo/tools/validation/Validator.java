@@ -3,23 +3,27 @@ package com.ferbo.tools.validation;
 import com.ferbo.tools.result.OperationResult;
 
 /**
- * Interfaz base para validadores del toolkit.
- * 
+ * Contrato base para todos los validadores del sistema.
+ *
  * <p>
- * Define el contrato que deben seguir todos los validadores.
- * Un validador recibe un objeto y registra los errores encontrados
- * en instancia de {@link Notification}.
+ * Un {@code Validator} se encarga de verificar que un objeto cumpla
+ * con reglas de negocio o integridad.
  * </p>
- * 
+ *
+ * <p>
+ * El resultado de la validación se devuelve como un {@link OperationResult},
+ * permitiendo manejar errores sin lanzar excepciones.
+ * </p>
+ *
  * @param <T> tipo del objeto a validar
  */
 public interface Validator<T> {
 
     /**
      * Ejecuta la validación sobre el objeto proporcionado.
-     * 
-     * @param value objeto a validar
-     * @param notification contenedor donde se registran los errores
+     *
+     * @param target objeto a validar
+     * @return resultado de la validación
      */
-    void validate(T value, Notification notification);
+    OperationResult<T> validate(T target);
 }
