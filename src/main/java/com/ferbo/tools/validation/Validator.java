@@ -1,5 +1,7 @@
 package com.ferbo.tools.validation;
 
+import com.ferbo.tools.result.OperationResult;
+
 /**
  * Interfaz base para validadores del toolkit.
  * 

@@ -5,12 +5,12 @@ import java.util.List;
 
 import com.ferbo.tools.exception.ValidationException;
 
-public final class OperationResult {
+public final class OperationResult <T> {
 
     private final boolean success;
     private final List<Message> messages;
     private final int affectedCount;
-    private final Object data;
+    private final T data;
 
     /**
      * Constructor principal. 
@@ -20,7 +20,7 @@ public final class OperationResult {
      * @param affectedCount cantidad de elementos afectados
      * @param data resultado de la operacion (opcional)
      */
-    public OperationResult(boolean succes, List<Message> messages, int affectedCount, Object data) {
+    public OperationResult(boolean success, List<Message> messages, int affectedCount, T data) {
 
         if (messages == null) {
             throw new ValidationException("La lista de mensajes no puede ser nula");
@@ -30,7 +30,7 @@ public final class OperationResult {
             throw new ValidationException("El número de elementos afectados no puede ser negativo");
         }
 
-        this.success = succes;
+        this.success = success;
         this.messages = Collections.unmodifiableList(messages);
         this.affectedCount = affectedCount;
         this.data = data;
@@ -60,7 +60,7 @@ public final class OperationResult {
     /**
      * Devuelve los datos asociados a la operación.
      */
-    public Object getData() {
+    public T getData() {
         return data;
     }
 

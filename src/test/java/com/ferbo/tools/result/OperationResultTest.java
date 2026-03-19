@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -19,7 +20,7 @@ public class OperationResultTest {
         List<Message> messages = new ArrayList<>();
         messages.add(new Message(MessageLevel.SUCCESS, "OK", "Operación exitosa"));
 
-        OperationResult result = new OperationResult(true, messages, 1, "DATA");
+        OperationResult<String> result = new OperationResult<>(true, messages, 1, "DATA");
 
         assertTrue(result.isSuccess());
         assertEquals(1, result.getAffectedCount());
@@ -30,13 +31,13 @@ public class OperationResultTest {
     // Validaciones
     @Test(expected = ValidationException.class)
     public void testMessagesNullThrowsException() {
-        new OperationResult(true, null, 1, null);
+        new OperationResult<>(true, null, 1, null);
     }
 
     @Test(expected = ValidationException.class)
     public void testAffectedCountNegativeThrowsException() {
         List<Message> messages = new ArrayList<>();
-        new OperationResult(true, messages, -1, null);
+        new OperationResult<>(true, messages, -1, null);
     }
 
     // Inmutabilidad de mensajes
@@ -45,7 +46,7 @@ public class OperationResultTest {
         List<Message> messages = new ArrayList<>();
         messages.add(new Message(MessageLevel.INFO, "Info", null));
 
-        OperationResult result = new OperationResult(true, messages, 1, null);
+        OperationResult<Void> result = new OperationResult<>(true, messages, 1, null);
 
         // Intento de modificacion (debe fallar)
         result.getMessages().add(new Message(MessageLevel.ERROR, "Error", null));
@@ -57,7 +58,7 @@ public class OperationResultTest {
         List<Message> messages = new ArrayList<>();
         messages.add(new Message(MessageLevel.ERROR, "Error", "Fallo"));
 
-        OperationResult result = new OperationResult(false, messages, 0, null);
+        OperationResult<Void> result = new OperationResult<>(false, messages, 0, null);
 
         assertTrue(result.hasErrors());
     }
@@ -67,7 +68,7 @@ public class OperationResultTest {
         List<Message> messages = new ArrayList<>();
         messages.add(new Message(MessageLevel.SUCCESS, "OK", null));
 
-        OperationResult result = new OperationResult(true, messages, 1, null);
+        OperationResult<Void> result = new OperationResult<>(true, messages, 1, null);
 
         assertFalse(result.hasErrors());
     }
@@ -78,7 +79,7 @@ public class OperationResultTest {
         List<Message> messages = new ArrayList<>();
         messages.add(new Message(MessageLevel.WARNING, "Advertencia", null));
 
-        OperationResult result = new OperationResult(true, messages, 1, null);
+        OperationResult<Void> result = new OperationResult<>(true, messages, 1, null);
 
         assertTrue(result.hasWarnings());
     }
@@ -88,9 +89,18 @@ public class OperationResultTest {
         List<Message> messages = new ArrayList<>();
         messages.add(new Message(MessageLevel.SUCCESS, "OK", null));
 
-        OperationResult result = new OperationResult(true, messages, 1, null);
+        OperationResult<Void> result = new OperationResult<>(true, messages, 1, null);
 
         assertFalse(result.hasWarnings());
+    }
+
+    @Test
+    public void testTypeSafety() {
+        OperationResult<Integer> result = new OperationResult<>(true, Collections.emptyList(), 1, 100);
+
+        Integer value = result.getData(); // sin cast
+
+        assertEquals(Integer.valueOf(100), value);
     }
 
     // toString
@@ -99,7 +109,7 @@ public class OperationResultTest {
         List<Message> messages = new ArrayList<>();
         messages.add(new Message(MessageLevel.SUCCESS, "OK", null));
 
-        OperationResult result = new OperationResult(true, messages, 1, null);
+        OperationResult<Void> result = new OperationResult<>(true, messages, 1, null);
 
         String str = result.toString();
 
