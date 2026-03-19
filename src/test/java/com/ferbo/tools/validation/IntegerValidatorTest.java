@@ -1,48 +1,65 @@
 package com.ferbo.tools.validation;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.ferbo.tools.result.OperationResult;
+
 public class IntegerValidatorTest {
 
     @Test
-    public void debeDetectarValorNulo() {
-        Notification notification = new Notification();
+    public void shouldReturnSuccessForValidValue() {
+        IntegerValidator validator = new IntegerValidator(0, 10);
 
-        IntegerValidator.notNull(null, "edad", notification);
+        OperationResult<Integer> result = validator.validate(5);
 
-        assertTrue(notification.hasErrors());
+        assertTrue(result.isSuccess());
+        assertEquals(Integer.valueOf(5), result.getData());
     }
 
     @Test
-    public void debeDetectarValorNegativo() {
+    public void shouldReturnFailureForNullValue() {
+        IntegerValidator validator = new IntegerValidator(0, 10);
 
-        Notification notification = new Notification();
+        OperationResult<Integer> result = validator.validate(null);
 
-        IntegerValidator.positive(-5, "cantidad", notification);
-
-        assertTrue(notification.hasErrors());
+        assertFalse(result.isSuccess());
+        assertTrue(result.hasErrors());
+        assertEquals("El valor no puede ser nulo", result.getMessages().get(0).getBody());
     }
 
     @Test
-    public void debeDetectarFueraDeRango() {
+    public void shouldReturnFailureForBelowMin() {
+        IntegerValidator validator = new IntegerValidator(1, 10);
 
-        Notification notification = new Notification();
+        OperationResult<Integer> result = validator.validate(0);
 
-        IntegerValidator.range(200, 1, 100, "valor", notification);
-
-        assertTrue(notification.hasErrors());
+        assertFalse(result.isSuccess());
+        assertTrue(result.hasErrors());
+        assertTrue(result.getMessages().get(0).getBody().contains("menor que"));
     }
 
     @Test
-    public void noDebeGenerarErrorCuandoEsValido() {
+    public void shouldReturnFailureForAboveMax() {
+        IntegerValidator validator = new IntegerValidator(0, 10);
 
-        Notification notification = new Notification();
+        OperationResult<Integer> result = validator.validate(15);
 
-        IntegerValidator.range(50, 1, 100, "valor", notification);
+        assertFalse(result.isSuccess());
+        assertTrue(result.hasErrors());
+        assertTrue(result.getMessages().get(0).getBody().contains("mayor que"));
+    }
 
-        assertFalse(notification.hasErrors());
+    @Test
+    public void shouldReturnSuccessWithoutRange() {
+        IntegerValidator validator = new IntegerValidator();
+
+        OperationResult<Integer> result = validator.validate(1000);
+
+        assertTrue(result.isSuccess());
+        assertEquals(Integer.valueOf(1000), result.getData());
     }
 }

@@ -1,71 +1,60 @@
 package com.ferbo.tools.validation;
 
+import com.ferbo.tools.result.MessageLevel;
+import com.ferbo.tools.result.OperationResult;
+import com.ferbo.tools.result.ResultBuilder;
+
 /**
- * Utilidad para validar valores de tipo Integer.
- * 
+ * Validador de números enteros.
+ *
  * <p>
- * Proporciona métodos estáticos para validar números enteros
- * en diferentes escenarios comunes dentro de sistemas empresariales.
+ * Permite validar un valor dentro de un rango opcional:
+ * - valor mínimo
+ * - valor máximo
  * </p>
+ *
+ * @param <T> tipo de dato a validar (Integer)
  */
-public final class IntegerValidator {
+public class IntegerValidator implements Validator<Integer> {
 
-    private IntegerValidator() {
-        // Evita instanciación
+    private final Integer min;
+    private final Integer max;
+
+    /**
+     * Constructor con rango opcional.
+     *
+     * @param min valor mínimo permitido (nullable)
+     * @param max valor máximo permitido (nullable)
+     */
+    public IntegerValidator(Integer min, Integer max) {
+        this.min = min;
+        this.max = max;
     }
 
     /**
-     * Verifica que el valor no sea nulo.
-     * 
-     * @param value valor a valdar
-     * @param field nombre del campo
-     * @param notification contenedor de errores
+     * Constructor sin rango
      */
-    public static void notNull(Integer value, String field, Notification notification) {
-        if (value == null) {
-            notification.addError(field + " no debe ser nulo");
-        }
+    public IntegerValidator() {
+        this(null, null);
     }
 
-    /**
-     * Verificar que el valor sea positivo (> 0)
-     * 
-     * @param value valor a validar
-     * @param field nombre del campo
-     * @param notification contenedor de errores
-     */
-    public static void positive(Integer value, String field, Notification notification) {
-        if (value != null && value <= 0) {
-            notification.addError(field + " debe ser mayor que cero");
-        }
-    }
+    @Override
+    public OperationResult<Integer> validate(Integer target) {
+        ResultBuilder<Integer> builder = ResultBuilder.<Integer>success().data(target);
 
-    /**
-     * Verificar que el valor sea mayor o igual que un minimo.
-     * 
-     * @param value valor a validar
-     * @param min valor minimo permitido
-     * @param field nombre del campo
-     * @param notification contenedor de errores
-     */
-    public static void min(Integer value, int min, String field, Notification notification) {
-        if (value != null && value < min) {
-            notification.addError(field + "debe ser mayor o igual que " + min );
+        if (target == null) {
+            builder = ResultBuilder.<Integer>failure()
+                    .message(MessageLevel.ERROR, "Valor inválido", "El valor no puede ser nulo");
+        } else {
+            if (min != null && target < min) {
+                builder = ResultBuilder.<Integer>failure()
+                        .message(MessageLevel.ERROR, "Valor inválido", "El valor no puede ser menor que " + min);
+            } else if (max != null && target > max) {
+                builder = ResultBuilder.<Integer>failure()
+                        .message(MessageLevel.ERROR, "Valor inválido", "El valor no puede ser mayor que " + max);
+            }
         }
-    }
 
-    /**
-     * Verifica que el valor esté dentro de un rango
-     * 
-     * @param value valor a validar
-     * @param min minimo permitido
-     * @param max máximo permitido
-     * @param field nombre del campo
-     * @param notification contenedor de errores
-     */
-    public static void range(Integer value, int min, int max, String field, Notification notification) {
-        if (value != null && value < min || value > max) {
-            notification.addError(field + " debe estar entre " + min + " y " + max);
-        }
+        return builder.build();
     }
 }
