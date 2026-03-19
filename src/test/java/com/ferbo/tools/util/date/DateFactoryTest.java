@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 
 import org.junit.Test;
 
-import com.ferbo.tools.exception.SystemException;
-
 public class DateFactoryTest {
 
     @Test
