@@ -1,6 +1,7 @@
 package com.ferbo.tools.validation;
 
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 
 import com.ferbo.tools.result.Message;
@@ -22,7 +23,7 @@ import com.ferbo.tools.value.money.Money;
 public class MonetaryValidator implements Validator<Money> {
 
     private final boolean positiveOnly;
-    private final String requiredCurrency;
+    private final Currency requiredCurrency;
 
     /**
      * Constructor con opciones de validación.
@@ -30,7 +31,7 @@ public class MonetaryValidator implements Validator<Money> {
      * @param positiveOnly     si true, el valor debe ser mayor que cero
      * @param requiredCurrency moneda requerida (nullable)
      */
-    public MonetaryValidator(boolean positiveOnly, String requiredCurrency) {
+    public MonetaryValidator(boolean positiveOnly, Currency requiredCurrency) {
         this.positiveOnly = positiveOnly;
         this.requiredCurrency = requiredCurrency;
     }
@@ -54,7 +55,7 @@ public class MonetaryValidator implements Validator<Money> {
                 messages.add(new Message(MessageLevel.ERROR, "Dinero inválido", "El valor debe ser positivo"));
             }
             if (requiredCurrency != null
-                    && !requiredCurrency.equals(target.getCurrency().getCurrencyCode())) { 
+                    && !requiredCurrency.getCurrencyCode().equals(target.getCurrency().getCurrencyCode())) { 
                 messages.add(
                         new Message(MessageLevel.ERROR, "Dinero inválido", "La moneda debe ser " + requiredCurrency));
             }

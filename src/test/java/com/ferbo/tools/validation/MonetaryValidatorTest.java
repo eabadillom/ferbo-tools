@@ -20,7 +20,7 @@ public class MonetaryValidatorTest {
     @Test
     public void shouldReturnSuccessForValidMoney() {
         Money money = new Money(new BigDecimal("100.00"), usd);
-        MonetaryValidator validator = new MonetaryValidator(true, "USD");
+        MonetaryValidator validator = new MonetaryValidator(true, usd);
 
         OperationResult<Money> result = validator.validate(money);
 
@@ -31,7 +31,7 @@ public class MonetaryValidatorTest {
 
     @Test
     public void shouldReturnFailureForNullMoney() {
-        MonetaryValidator validator = new MonetaryValidator(true, "USD");
+        MonetaryValidator validator = new MonetaryValidator(true, usd);
 
         OperationResult<Money> result = validator.validate(null);
 
@@ -43,7 +43,7 @@ public class MonetaryValidatorTest {
     @Test
     public void shouldReturnFailureForNegativeMoney() {
         Money money = new Money(new BigDecimal("-50.00"), usd);
-        MonetaryValidator validator = new MonetaryValidator(true, "USD");
+        MonetaryValidator validator = new MonetaryValidator(true, usd);
 
         OperationResult<Money> result = validator.validate(money);
 
@@ -55,7 +55,7 @@ public class MonetaryValidatorTest {
     @Test
     public void shouldReturnFailureForWrongCurrency() {
         Money money = new Money(new BigDecimal("100.00"), eur);
-        MonetaryValidator validator = new MonetaryValidator(true, "USD");
+        MonetaryValidator validator = new MonetaryValidator(true, usd);
 
         OperationResult<Money> result = validator.validate(money);
 
@@ -79,7 +79,7 @@ public class MonetaryValidatorTest {
     @Test
     public void shouldReturnSuccessForZeroOrNegativeWhenNotPositiveOnly() {
         Money money = new Money(new BigDecimal("-10.00"), usd);
-        MonetaryValidator validator = new MonetaryValidator(false, "USD");
+        MonetaryValidator validator = new MonetaryValidator(false, usd);
 
         OperationResult<Money> result = validator.validate(money);
 
