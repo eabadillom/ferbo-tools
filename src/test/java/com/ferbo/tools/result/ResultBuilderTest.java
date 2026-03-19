@@ -14,8 +14,8 @@ public class ResultBuilderTest {
     // Construcción SUCCESS
     @Test
     public void testSuccessBuilder() {
-        
-        OperationResult result = ResultBuilder.success()
+
+        OperationResult<String> result = ResultBuilder.<String>success()
                 .message(MessageLevel.SUCCESS, "OK", "Operación exitos")
                 .affectedCount(1)
                 .data("DATA")
@@ -31,8 +31,8 @@ public class ResultBuilderTest {
     @Test
     public void testFailureBuilder() {
 
-        OperationResult result = ResultBuilder.failure()
-                .message(MessageLevel.ERROR, "Error", "Fallo el preceso")
+        OperationResult<Void> result = ResultBuilder.<Void>failure()
+                .message(MessageLevel.ERROR, "Error", "Fallo el proceso")
                 .affectedCount(0)
                 .build();
 
@@ -44,27 +44,27 @@ public class ResultBuilderTest {
     // Agrega multiples mensajes
     @Test
     public void testMultipleMessages() {
-        
-        OperationResult result = ResultBuilder.success()
+
+        OperationResult<Void> result = ResultBuilder.<Void>success()
                 .message(MessageLevel.INFO, "Inicio", null)
                 .message(MessageLevel.WARNING, "Advertencia", "Dato incompleto")
                 .message(MessageLevel.SUCCESS, "Fin", null)
                 .build();
-        
+
         assertEquals(3, result.getMessages().size());
         assertTrue(result.hasWarnings());
     }
 
     // Agregar mensaje como objeto
-    @Test 
+    @Test
     public void testMessageObject() {
-        
+
         Message msg = new Message(MessageLevel.SUCCESS, "OK", null);
 
-        OperationResult result = ResultBuilder.success()
+        OperationResult<Void> result = ResultBuilder.<Void>success()
                 .message(msg)
                 .build();
-        
+
         assertEquals(1, result.getMessages().size());
         assertEquals(msg, result.getMessages().get(0));
     }
@@ -72,7 +72,7 @@ public class ResultBuilderTest {
     // Validación mensaje null
     @Test(expected = ValidationException.class)
     public void testMessageNullThrowsException() {
-        
+
         ResultBuilder.success()
                 .message((Message) null);
     }
@@ -89,11 +89,10 @@ public class ResultBuilderTest {
     @Test
     public void testBuildWithoutMessages() {
 
-        OperationResult result = ResultBuilder.success()
+        OperationResult<Void> result = ResultBuilder.<Void>success()
                 .affectedCount(0)
                 .build();
-        
-        
+
         assertTrue(result.isSuccess());
         assertEquals(0, result.getMessages().size());
     }
@@ -101,11 +100,23 @@ public class ResultBuilderTest {
     // Fluidez del builder
     @Test
     public void testFluentApi() {
-        
-        ResultBuilder builder = ResultBuilder.success();
-        
+
+        ResultBuilder<String> builder = ResultBuilder.<String>success();
+
         assertSame(builder, builder.message(MessageLevel.INFO, "Test", null));
         assertSame(builder, builder.affectedCount(1));
         assertSame(builder, builder.data("X"));
     }
-}   
+
+    @Test
+    public void testBuilderTypeSafety() {
+
+        OperationResult<Integer> result = ResultBuilder.<Integer>success()
+                .data(100)
+                .build();
+
+        Integer value = result.getData();
+
+        assertEquals(Integer.valueOf(100), value);
+    }
+}

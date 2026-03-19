@@ -5,38 +5,38 @@ import java.util.List;
 
 import com.ferbo.tools.exception.ValidationException;
 
-public class ResultBuilder {
+public class ResultBuilder<T> {
 
     private boolean success;
     private List<Message> messages = new ArrayList<>();
     private int affectedCount;
-    private Object data;
+    private T data;
 
     /**
      * Constructor privado para forzar uso de métodos estáticos.
      */
     private ResultBuilder(boolean success) {
-        this.success = success; 
+        this.success = success;
     }
 
     /**
      * Crea un builder para operación exitosa.
      */
-    public static ResultBuilder success() {
-        return new ResultBuilder(true);
+    public static <T> ResultBuilder<T> success() {
+        return new ResultBuilder<>(true);
     }
 
     /**
      * Crea un builder para operación fallida.
      */
-    public static ResultBuilder failure() {
-        return new ResultBuilder(false);
+    public static <T> ResultBuilder<T> failure() {
+        return new ResultBuilder<>(false);
     }
 
     /**
      * Agrega un mensaje.
      */
-    public ResultBuilder message(MessageLevel level, String title, String body) {
+    public ResultBuilder<T> message(MessageLevel level, String title, String body) {
         this.messages.add(new Message(level, title, body));
         return this;
     }
@@ -44,7 +44,7 @@ public class ResultBuilder {
     /**
      * Agrega un mensaje ya construido.
      */
-    public ResultBuilder message(Message message) {
+    public ResultBuilder<T> message(Message message) {
         if (message == null) {
             throw new ValidationException("El mensaje no puede ser nulo");
         }
@@ -55,7 +55,7 @@ public class ResultBuilder {
     /**
      * Define la cantidad de elementos afectados.
      */
-    public ResultBuilder affectedCount(int count) {
+    public ResultBuilder<T> affectedCount(int count) {
         if (count < 0) {
             throw new ValidationException("Los elementos afectados no puede ser negativo");
         }
@@ -66,7 +66,7 @@ public class ResultBuilder {
     /**
      * Define los datos de la operación.
      */
-    public ResultBuilder data(Object data) {
+    public ResultBuilder<T> data(T data) {
         this.data = data;
         return this;
     }
@@ -74,7 +74,7 @@ public class ResultBuilder {
     /**
      * Construye el OperationResult final.
      */
-    public OperationResult build() {
-        return new OperationResult(success, messages, affectedCount, data);
+    public OperationResult<T> build() {
+        return new OperationResult<>(success, messages, affectedCount, data);
     }
 }
