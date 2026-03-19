@@ -1,71 +1,77 @@
 package com.ferbo.tools.validation;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ferbo.tools.result.Message;
+import com.ferbo.tools.result.MessageLevel;
+import com.ferbo.tools.result.OperationResult;
+import com.ferbo.tools.result.ResultBuilder;
+import com.ferbo.tools.value.money.Money;
 
 /**
- * Utilidad para validar valores monetarios representados por BigDecimal.
- * 
+ * Validador de objetos Money.
+ *
  * <p>
- * Proporciona validaciones communes para montos financieros como
- * valores nulos, negativos o inferiores a un minimo permitido.
+ * Permite validar reglas básicas sobre dinero:
+ * - objeto no nulo
+ * - cantidad positiva
+ * - moneda obligatoria (opcional)
  * </p>
  */
-public final class MonetaryValidator {
+public class MonetaryValidator implements Validator<Money> {
 
-    private MonetaryValidator() {
-        // Evita instanciación
+    private final boolean positiveOnly;
+    private final String requiredCurrency;
+
+    /**
+     * Constructor con opciones de validación.
+     *
+     * @param positiveOnly     si true, el valor debe ser mayor que cero
+     * @param requiredCurrency moneda requerida (nullable)
+     */
+    public MonetaryValidator(boolean positiveOnly, String requiredCurrency) {
+        this.positiveOnly = positiveOnly;
+        this.requiredCurrency = requiredCurrency;
     }
 
     /**
-     * Verifica que el monto no sea nulo.
-     * 
-     * @param value monto a validar
-     * @param field nombre del campo
-     * @param notification contenedor de errores
+     * Constructor por defecto: cualquier Money válido
      */
-    public static void notNull(BigDecimal value, String field, Notification notification) {
-        if (value == null) {
-            notification.addError(field + " no debe ser nulo");
-        }
+    public MonetaryValidator() {
+        this(false, null);
     }
 
-    /**
-     * Varifica que el monto sea mayor que cero.
-     * 
-     * @param value monto a validar
-     * @param field nombre del campo
-     * @param notification contenedor de errores
-     */
-    public static void positive(BigDecimal value, String field, Notification notification) {
-        if (value != null && value.compareTo(BigDecimal.ZERO) <= 0) {
-            notification.addError(field + " debe ser mayor que cero");
-        }
-    }
+    @Override
+    public OperationResult<Money> validate(Money target) {
 
-    /**
-     * Verifica que el monto sea mayor o igual que cero.
-     * 
-     * @param value monto a validar
-     * @param field nombre del campo
-     * @param notification contenedor de errores
-     */
-    public static void nonNegative(BigDecimal value, String field, Notification notification) {
-        if (value != null && value.compareTo(BigDecimal.ZERO) < 0) {
-            notification.addError(field + " no puede ser negativo");
-        }
-    }
+        List<Message> messages = new ArrayList<>();
 
-    /**
-     * Varifica que el monto sea mayor o igual a un minimo. 
-     * 
-     * @param value monto a validar
-     * @param min valor minimo permitido
-     * @param field nombre del campo
-     * @param notification contenedor de errores
-     */
-    public static void min(BigDecimal value, BigDecimal min, String field, Notification notification) {
-        if (value != null && value.compareTo(min) < 0) {
-            notification.addError(field + " debe ser mayor o igual que " + min);
+        if (target == null) {
+            messages.add(new Message(MessageLevel.ERROR, "Dinero inválido", "El objeto Money no puede ser nulo"));
+        } else {
+            if (positiveOnly && target.getAmount().doubleValue() <= 0) {
+                messages.add(new Message(MessageLevel.ERROR, "Dinero inválido", "El valor debe ser positivo"));
+            }
+            if (requiredCurrency != null
+                    && !requiredCurrency.equals(target.getCurrency().getCurrencyCode())) { 
+                messages.add(
+                        new Message(MessageLevel.ERROR, "Dinero inválido", "La moneda debe ser " + requiredCurrency));
+            }
         }
-    } 
+
+        // Construir el OperationResult final
+        ResultBuilder<Money> builder;
+        if (!messages.isEmpty()) {
+            builder = ResultBuilder.<Money>failure().data(target);
+        } else {
+            builder = ResultBuilder.<Money>success().data(target);
+        }
+
+        for (Message m : messages) {
+            builder.message(m);
+        }
+
+        return builder.build();
+    }
 }
