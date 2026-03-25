@@ -5,27 +5,39 @@ package com.ferbo.tools.exception;
     * 
     * <p>
     * Permite centralizar el manejo de errores relacionados con las utilidades
-    * del toolkit. Todas las excepciones especificadas deben extender de esta clase. 
+    * del toolkit. 
     * </p>
 */
 public class ToolException extends RuntimeException {
 
-    /**
-     * Crea una excepción con un mensaje descriptivo.
-     * 
-     * @param message descripción del error
-     */
-   public ToolException(String message) {
-    super(message);
-   }
+    private final String code;
 
-   /**
-    * Crea una excepción con mensaje y causa.
-    * 
-    * @param message drescripción del error
-    * @param cause-excepción original que provocó el problema
-    */
-   public ToolException(String message, Throwable cause){
-    super(message, cause);
-   }
+    public ToolException(String message) {
+        super(message);
+        this.code = null;
+    }
+
+    public ToolException(String message, Throwable cause) {
+        super(message, cause);
+        this.code = null;
+    }
+
+    public ToolException(String code, String message) {
+        super(message);
+        this.code = code;
+    }
+
+    public ToolException(String code, String message, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+    }
+
+    public ToolException(Throwable cause) {
+        super(cause);
+        this.code = null;
+    }
+
+    public String getCode() {
+        return code;
+    }
 }

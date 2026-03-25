@@ -3,7 +3,7 @@ package com.ferbo.tools.exception;
 /**
  * Excepción que representa errores relacionados con reglas de negocio.
  * 
- * Se utiliza cuando una operacipon no pouede completarse debido a una
+ * Se utiliza cuando una operacipon no puede completarse debido a una
  * condición del dominio del negocio, por ejemplo:
  * 
  * <p>
@@ -23,24 +23,31 @@ package com.ferbo.tools.exception;
  * para informar al usuario o registrar la situación.
  * </p>
  */
-public class BusinessException extends ToolException {
+public class BusinessException extends RuntimeException {
 
-    /**
-     * Crea una excepcipon de negocio con un mensaje descriptivo.
-     * 
-     * @param message descripción del error de negocio
-     */
+    private final String code;
+
     public BusinessException(String message) {
         super(message);
+        this.code = null;
     }
 
-    /**
-     * Crea una excepción de negocio con mensaje y causa.
-     * 
-     * @param mensaje descripción del error
-     * @param cause excepción original
-     */
-    public BusinessException(String message, Throwable cause){
+    public BusinessException(String message, Throwable cause) {
         super(message, cause);
+        this.code = null;
+    }
+
+    public BusinessException(String code, String message) {
+        super(message);
+        this.code = code;
+    }
+
+    public BusinessException(String code, String message, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
     }
 }
