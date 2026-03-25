@@ -1,0 +1,200 @@
+package com.ferbo.tools.value.money;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Currency;
+import java.util.Objects;
+
+import com.ferbo.tools.exception.BusinessException;
+import com.ferbo.tools.exception.ValidationException;
+
+/**
+ * Value Object que representa una cantidad monetaria segura e inmutable.
+ * Garantiza que el monto siempre tenga la escala correcta según la moneda.
+ * 
+ * Características:
+ * - Inmutable
+ * - Precio (usa BigDecimal)
+ * - Seguro en operaciones
+ * - Dependiente de la moneda
+ * 
+ * Permite Valores:
+ * - Positivos
+ * - Negativos
+ * - Cero
+ */
+public final class Money implements Comparable<Money> {
+
+    private final BigDecimal amount;
+    private final Currency currency;
+
+    /**
+     * Constructor principal.
+     * Aplica Validaciones y redondeo automático.
+     * 
+     * @param amount   Cantidad monetaria
+     * @param currency Moneda
+     */
+    public Money(BigDecimal amount, Currency currency) {
+        validate(amount, currency);
+
+        this.currency = currency;
+        this.amount = CurrencyUtils.round(amount, currency);
+    }
+
+    /**
+     * Método de validación interna.
+     */
+    private void validate(BigDecimal amount, Currency currency) {
+        if (amount == null) {
+            throw new ValidationException("El monto no puede ser nulo");
+        }
+
+        if (currency == null) {
+            throw new ValidationException("La moneda no puede ser nula");
+        }
+    }
+
+    /**
+     * Suma dos valores monetarios.
+     */
+    public Money add(Money other) {
+        validateSameCurrency(other);
+        return new Money(this.amount.add(other.amount), this.currency);
+    }
+
+    /**
+     * Resta dos valores monetarios.
+     */
+    public Money subtract(Money other) {
+        validateSameCurrency(other);
+        return new Money(this.amount.subtract(other.amount), this.currency);
+    }
+
+    /**
+     * Multiplica el monto por un factor.
+     */
+    public Money multiply(BigDecimal factor) {
+        if (factor == null) {
+            throw new ValidationException("El factor no puede ser nulo");
+        }
+
+        BigDecimal result = this.amount.multiply(factor);
+        return new Money(result, this.currency);
+    }
+
+    /**
+     * Divide el monto por un divisor.
+     */
+    public Money divide(BigDecimal divisor) {
+        if (divisor == null) {
+            throw new ValidationException("El divisor no puede ser nulo");
+        }
+
+        if (BigDecimal.ZERO.compareTo(divisor) == 0) {
+            throw new BusinessException("No se puede dividir entre cero");
+        }
+
+        // Escala alta temporal para evitar pérdida de precisión
+        BigDecimal result = this.amount.divide(divisor, 10, RoundingMode.HALF_UP);
+
+        return new Money(result, this.currency);
+    }
+
+    /**
+     * Valida que ambas monedas sean iguales.
+     */
+    private void validateSameCurrency(Money other) {
+        if (other == null) {
+            throw new ValidationException("El valor a operar no puede ser nulo");
+        }
+
+        if (!this.currency.equals(other.currency)) {
+            throw new BusinessException("Las monedas deben ser iguales para operar");
+        }
+    }
+
+    /**
+     * Compara dos valores monetarios.
+     */
+    @Override
+    public int compareTo(Money other) {
+        validateSameCurrency(other);
+        return this.amount.compareTo(other.amount);
+    }
+
+    /**
+     * Obtiene el monto.
+     */
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    /**
+     * Obtiene la moneda
+     */
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    /**
+     * Indica si el valor es cero.
+     */
+    public boolean isZero() {
+        return BigDecimal.ZERO.compareTo(this.amount) == 0;
+    }
+
+    /**
+     * Indica si el valor es negativo.
+     */
+    public boolean isNegative() {
+        return this.amount.signum() < 0;
+    }
+
+    /**
+     * Indica si el valor es positivo.
+     */
+    public boolean isPositive() {
+        return this.amount.signum() > 0;
+    }
+
+    /**
+     * Devuelve una nueva instancia de Money con el monto negado,
+     * es decir, invierte el signo del valor (positivo a negativo y viceversa),
+     * manteniendo la misma moneda.
+     */
+    public Money negate() {
+        return new Money(this.amount.negate(), this.currency);
+    }
+
+    /**
+     * equals basado en monto y moneda.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Money))
+            return false;
+
+        Money money = (Money) o;
+
+        return amount.compareTo(money.amount) == 0 && currency.equals(money.currency);
+    }
+
+    /**
+     * hashCode consistente con equals.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount.stripTrailingZeros(), currency);
+    }
+
+    /**
+     * Representación en texto.
+     */
+    @Override
+    public String toString() {
+        return CurrencyUtils.format(this);
+    }
+}
