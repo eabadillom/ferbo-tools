@@ -13,8 +13,6 @@ import com.ferbo.tools.result.ResultBuilder;
  * - no vacío
  * - longitud máxima
  * </p>
- *
- * @param <T> tipo de texto a validar (normalmente String)
  */
 public class TextValidator implements Validator<String> {
 
@@ -23,7 +21,7 @@ public class TextValidator implements Validator<String> {
     /**
      * Constructor con longitud máxima permitida.
      *
-     * @param maxLength longitud máxima del texto (si <=0 no se valida)
+     * @param maxLength longitud máxima del texto (si <= 0 no se valida)
      */
     public TextValidator(int maxLength) {
         this.maxLength = maxLength;
@@ -37,17 +35,19 @@ public class TextValidator implements Validator<String> {
     }
 
     @Override
-    public OperationResult<String> validate(String target) {
-        ResultBuilder<String> builder = ResultBuilder.<String>success().data(target);
+    public void validate(String target, Notification notification) {
 
+        // Validación de nulo o vacío
         if (target == null || target.trim().isEmpty()) {
-            builder = ResultBuilder.<String>failure()
-                    .message(MessageLevel.ERROR, "Texto inválido", "El texto no puede ser vacío o nulo");
-        } else if (maxLength > 0 && target.length() > maxLength) {
-            builder = ResultBuilder.<String>failure()
-                    .message(MessageLevel.ERROR, "Texto inválido", "El texto excede la longitud máxima de " + maxLength + " caracteres");
+            notification.addError("El texto no puede ser vacío o nulo");
+            return;
         }
 
-        return builder.build();
+        // Validación de longitud máxima
+        if (maxLength > 0 && target.length() > maxLength) {
+            notification.addError(
+                "El texto excede la longitud máxima de " + maxLength + " caracteres"
+            );
+        }
     }
 }
