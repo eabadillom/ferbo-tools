@@ -1,9 +1,5 @@
 package com.ferbo.tools.validation;
 
-import com.ferbo.tools.result.MessageLevel;
-import com.ferbo.tools.result.OperationResult;
-import com.ferbo.tools.result.ResultBuilder;
-
 /**
  * Validador de texto genérico.
  *
