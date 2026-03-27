@@ -2,57 +2,64 @@ package com.ferbo.tools.validation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-
-import com.ferbo.tools.result.MessageLevel;
-import com.ferbo.tools.result.OperationResult;
-import com.ferbo.tools.result.ResultBuilder;
 
 /**
  * Prueba básica para el contrato de validator.
  */
 public class ValidatorTest {
 
+    private Notification notification;
+
     private static class DummyValidator implements Validator<String> {
 
+        private int maxLength;
+
+        public DummyValidator(int maxLength){
+            this.maxLength = maxLength;
+        }
+
+        public DummyValidator() {
+            this(0);
+        }
+
         @Override
-        public OperationResult<String> validate(String target) {
+        public void validate(String target, Notification notification) {
 
             if (target == null || target.trim().isEmpty()) {
-                return ResultBuilder.<String>failure()
-                        .message(MessageLevel.ERROR, "Error", "Texto vacío")
-                        .build();
+                notification.addError("El texto no puede ser vacío o nulo");
+                return;
             }
 
-            return ResultBuilder.<String>success()
-                    .data(target)
-                    .build();
+            if (maxLength > 0 && target.length() > maxLength) {
+                notification.addError(
+                        "El texto excede la longitud máxima de " + maxLength + " caracteres");
+            }
         }
     }
 
     @Test
     public void shouldReturnSuccessWhenValid() {
+        int max = 10;
+        Validator<String> validator = new DummyValidator(max);
+        notification = new Notification();
 
-        Validator<String> validator = new DummyValidator();
+        validator.validate("Hola", notification);
 
-        OperationResult<String> result = validator.validate("Hola");
-
-        assertTrue(result.isSuccess());
-        assertEquals("Hola", result.getData());
+        assertFalse(notification.hasErrors());
     }
 
     @Test
     public void shouldReturnFailureWhenInvalid() {
 
         Validator<String> validator = new DummyValidator();
+        notification = new Notification();
 
-        OperationResult<String> result = validator.validate("");
+        validator.validate("", notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
-        assertNull(result.getData());
+        assertTrue(notification.hasErrors());
+        assertEquals("El texto no puede ser vacío o nulo", notification.getErrors().get(0));
     }
 }
