@@ -23,7 +23,9 @@
 hs_err_pid*
 replay_pid*
 
-
+.classpath
+.project
+.settings/
 target/
 .idea/
 *.iml
