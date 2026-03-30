@@ -6,59 +6,62 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.ferbo.tools.result.OperationResult;
-
 public class TextValidatorTest {
+
+    private Notification notification;
 
     @Test
     public void shouldReturnSuccessForValidText() {
         TextValidator validator = new TextValidator(10);
+        notification = new Notification();
 
-        OperationResult<String> result = validator.validate("Hola");
+        validator.validate("Hola", notification);
 
-        assertTrue(result.isSuccess());
-        assertEquals("Hola", result.getData());
+        assertFalse(notification.hasErrors());
     }
 
     @Test
     public void shouldReturnFailureForNullText() {
         TextValidator validator = new TextValidator(10);
+        notification = new Notification();
 
-        OperationResult<String> result = validator.validate(null);
+        validator.validate(null, notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
-        assertEquals("El texto no puede ser vacío o nulo", result.getMessages().get(0).getBody());
+        assertTrue(notification.hasErrors());
+        assertEquals("El texto no puede ser vacío o nulo", notification.getErrors().get(0));
     }
 
     @Test
     public void shouldReturnFailureForEmptyText() {
         TextValidator validator = new TextValidator(10);
+        notification = new Notification();
 
-        OperationResult<String> result = validator.validate("   ");
+        validator.validate("   ", notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
+        
+        assertTrue(notification.hasErrors());
+        assertEquals("El texto no puede ser vacío o nulo", notification.getErrors().get(0));
     }
 
     @Test
     public void shouldReturnFailureForTooLongText() {
-        TextValidator validator = new TextValidator(5);
+        int maxLength = 5;
+        TextValidator validator = new TextValidator(maxLength);
+        notification = new Notification();
 
-        OperationResult<String> result = validator.validate("Excedido");
+        validator.validate("Excedido", notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
-        assertTrue(result.getMessages().get(0).getBody().contains("longitud máxima"));
+        assertTrue(notification.hasErrors());
+        assertTrue(notification.getErrors().get(0).contains("El texto excede la longitud máxima de " + maxLength + " caracteres"));
     }
 
     @Test
     public void shouldReturnSuccessWithoutMaxLength() {
         TextValidator validator = new TextValidator();
+        notification = new Notification();
 
-        OperationResult<String> result = validator.validate("Texto largo que supera cualquier límite");
+        validator.validate("Texto largo que supera cualquier límite", notification);
 
-        assertTrue(result.isSuccess());
-        assertEquals("Texto largo que supera cualquier límite", result.getData());
+        assertFalse(notification.hasErrors());
     }
 }

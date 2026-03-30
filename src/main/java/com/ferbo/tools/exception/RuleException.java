@@ -15,23 +15,19 @@ package com.ferbo.tools.exception;
  */
 public class RuleException extends BusinessException {
 
-    /**
-     * Crea una excepción de la regla de negocio con mensaje descriptivo.
-     * 
-     * @param mensaje descripción del error de regla
-     */
-    public RuleException(String mensaje) {
-        super(mensaje);
+    public RuleException(String message) {
+        super(message);
     }
 
-    /**
-     * Crea una excepción de la regla de negocio con mensaje y causa original
-     * 
-     * @param message descripción del error
-     * @param cause excepción original
-     */
     public RuleException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    public RuleException(String code, String message) {
+        super(code, message);
+    }
+
+    public RuleException(String code, String message, Throwable cause) {
+        super(code, message, cause);
+    }
 }

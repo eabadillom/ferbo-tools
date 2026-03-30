@@ -6,7 +6,7 @@ package com.ferbo.tools.exception;
  * <p>
  * Se utiliza para capturar problemas de sistema, como fallos de conexión,
  * errores de lectura/escritura, o cualquier situación inesperada que no
- * pueda clasificars como error de negocio o validación.
+ * pueda clasificarse como error de negocio o validación.
  * </p>
  * 
  * <p>
@@ -14,25 +14,36 @@ package com.ferbo.tools.exception;
  * de errores de negocio.
  * </p>
  */
-public class SystemException extends ToolException{
+public class SystemException extends RuntimeException {
 
-    /**
-     * Crea una excepción de sistema con mensaje descriptivo.
-     * 
-     * @param message descripción del error
-     */
+    private final String code;
+
     public SystemException(String message) {
         super(message);
+        this.code = null;
     }
 
-    /**
-     * Crea una excepción de sistema con mensaje y causa original.
-     * 
-     * @param message descripción de error
-     * @param cause excepción original
-     */
     public SystemException(String message, Throwable cause) {
         super(message, cause);
+        this.code = null;
     }
 
+    public SystemException(String code, String message) {
+        super(message);
+        this.code = code;
+    }
+
+    public SystemException(String code, String message, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+    }
+
+    public SystemException(Throwable cause) {
+        super(cause);
+        this.code = null;
+    }
+
+    public String getCode() {
+        return code;
+    }
 }

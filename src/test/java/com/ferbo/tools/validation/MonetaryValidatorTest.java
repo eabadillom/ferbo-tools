@@ -9,10 +9,11 @@ import java.util.Currency;
 
 import org.junit.Test;
 
-import com.ferbo.tools.result.OperationResult;
 import com.ferbo.tools.value.money.Money;
 
 public class MonetaryValidatorTest {
+
+    private Notification notification;
 
     private final Currency eur = Currency.getInstance("EUR");
     private final Currency usd = Currency.getInstance("USD");
@@ -21,70 +22,67 @@ public class MonetaryValidatorTest {
     public void shouldReturnSuccessForValidMoney() {
         Money money = new Money(new BigDecimal("100.00"), usd);
         MonetaryValidator validator = new MonetaryValidator(true, usd);
+        notification = new Notification();
 
-        OperationResult<Money> result = validator.validate(money);
+        validator.validate(money, notification);
 
-        assertTrue(result.isSuccess());
-        assertEquals(money, result.getData());
-        assertFalse(result.hasErrors());
+        assertFalse(notification.hasErrors());
     }
 
     @Test
     public void shouldReturnFailureForNullMoney() {
         MonetaryValidator validator = new MonetaryValidator(true, usd);
+        notification = new Notification();
 
-        OperationResult<Money> result = validator.validate(null);
+        validator.validate(null, notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
-        assertEquals("El objeto Money no puede ser nulo", result.getMessages().get(0).getBody());
+        assertTrue(notification.hasErrors());
+        assertEquals("El objeto Money no puede ser nulo", notification.getErrors().get(0));
     }
 
     @Test
     public void shouldReturnFailureForNegativeMoney() {
         Money money = new Money(new BigDecimal("-50.00"), usd);
         MonetaryValidator validator = new MonetaryValidator(true, usd);
+        notification = new Notification();
 
-        OperationResult<Money> result = validator.validate(money);
+        validator.validate(money, notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
-        assertEquals("El valor debe ser positivo", result.getMessages().get(0).getBody());
+        assertTrue(notification.hasErrors());
+        assertEquals("El valor debe ser positivo", notification.getErrors().get(0));
     }
 
     @Test
     public void shouldReturnFailureForWrongCurrency() {
         Money money = new Money(new BigDecimal("100.00"), eur);
         MonetaryValidator validator = new MonetaryValidator(true, usd);
+        notification = new Notification();
 
-        OperationResult<Money> result = validator.validate(money);
+        validator.validate(money, notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
-        assertEquals("La moneda debe ser USD", result.getMessages().get(0).getBody());
+        assertTrue(notification.hasErrors());
+        assertEquals("La moneda debe ser USD", "La moneda debe ser " + usd);
     }
 
     @Test
     public void shouldReturnSuccessWithoutCurrencyCheck() {
         Money money = new Money(new BigDecimal("50.00"), eur);
         MonetaryValidator validator = new MonetaryValidator(true, null);
+        notification = new Notification();
 
-        OperationResult<Money> result = validator.validate(money);
+        validator.validate(money, notification);
 
-        assertTrue(result.isSuccess());
-        assertEquals(money, result.getData());
-        assertFalse(result.hasErrors());
+        assertFalse(notification.hasErrors());
     }
 
     @Test
     public void shouldReturnSuccessForZeroOrNegativeWhenNotPositiveOnly() {
         Money money = new Money(new BigDecimal("-10.00"), usd);
         MonetaryValidator validator = new MonetaryValidator(false, usd);
+        notification = new Notification();
 
-        OperationResult<Money> result = validator.validate(money);
+        validator.validate(money, notification);
 
-        assertTrue(result.isSuccess());
-        assertEquals(money, result.getData());
-        assertFalse(result.hasErrors());
+        assertFalse(notification.hasErrors());
     }
 }

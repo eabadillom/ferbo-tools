@@ -1,7 +1,5 @@
 package com.ferbo.tools.validation;
 
-import com.ferbo.tools.result.OperationResult;
-
 /**
  * Contrato base para todos los validadores del sistema.
  *
@@ -11,8 +9,8 @@ import com.ferbo.tools.result.OperationResult;
  * </p>
  *
  * <p>
- * El resultado de la validación se devuelve como un {@link OperationResult},
- * permitiendo manejar errores sin lanzar excepciones.
+ * No lanza excepciones directamente ni construye resultados.
+ * En su lugar, agrega errores a un {@link Notification}.
  * </p>
  *
  * @param <T> tipo del objeto a validar
@@ -23,7 +21,7 @@ public interface Validator<T> {
      * Ejecuta la validación sobre el objeto proporcionado.
      *
      * @param target objeto a validar
-     * @return resultado de la validación
+     * @param notification acumulador de errores
      */
-    OperationResult<T> validate(T target);
+    void validate(T target, Notification notification);
 }

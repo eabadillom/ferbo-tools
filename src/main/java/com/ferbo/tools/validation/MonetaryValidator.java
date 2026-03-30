@@ -1,13 +1,7 @@
 package com.ferbo.tools.validation;
 
-import java.util.ArrayList;
 import java.util.Currency;
-import java.util.List;
 
-import com.ferbo.tools.result.Message;
-import com.ferbo.tools.result.MessageLevel;
-import com.ferbo.tools.result.OperationResult;
-import com.ferbo.tools.result.ResultBuilder;
 import com.ferbo.tools.value.money.Money;
 
 /**
@@ -16,7 +10,7 @@ import com.ferbo.tools.value.money.Money;
  * <p>
  * Permite validar reglas básicas sobre dinero:
  * - objeto no nulo
- * - cantidad positiva
+ * - cantidad positiva (opcional)
  * - moneda obligatoria (opcional)
  * </p>
  */
@@ -44,35 +38,28 @@ public class MonetaryValidator implements Validator<Money> {
     }
 
     @Override
-    public OperationResult<Money> validate(Money target) {
+    public void validate(Money target, Notification notification) {
 
-        List<Message> messages = new ArrayList<>();
-
+        // Validación de nulo
         if (target == null) {
-            messages.add(new Message(MessageLevel.ERROR, "Dinero inválido", "El objeto Money no puede ser nulo"));
-        } else {
-            if (positiveOnly && target.getAmount().doubleValue() <= 0) {
-                messages.add(new Message(MessageLevel.ERROR, "Dinero inválido", "El valor debe ser positivo"));
+            notification.addError("El objeto Money no puede ser nulo");
+            return;
+        }
+
+        // Validación de monto positivo
+        if (positiveOnly && target.getAmount() != null 
+                && target.getAmount().doubleValue() <= 0) {
+            notification.addError("El valor debe ser positivo");
+        }
+
+        // Validación de moneda requerida
+        if (requiredCurrency != null) {
+            if (target.getCurrency() == null ||
+                !requiredCurrency.getCurrencyCode()
+                    .equals(target.getCurrency().getCurrencyCode())) {
+
+                notification.addError("La moneda debe ser " + requiredCurrency);
             }
-            if (requiredCurrency != null
-                    && !requiredCurrency.getCurrencyCode().equals(target.getCurrency().getCurrencyCode())) { 
-                messages.add(
-                        new Message(MessageLevel.ERROR, "Dinero inválido", "La moneda debe ser " + requiredCurrency));
-            }
         }
-
-        // Construir el OperationResult final
-        ResultBuilder<Money> builder;
-        if (!messages.isEmpty()) {
-            builder = ResultBuilder.<Money>failure().data(target);
-        } else {
-            builder = ResultBuilder.<Money>success().data(target);
-        }
-
-        for (Message m : messages) {
-            builder.message(m);
-        }
-
-        return builder.build();
     }
 }
