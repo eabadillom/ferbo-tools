@@ -261,6 +261,6 @@ public class MoneyTest {
     public void shouldReturnCorrectToString() {
         Money money = new Money(new BigDecimal("1000.00"), mxn);
 
-        assertEquals("MXN $1,000.00", money.toString());
+        assertEquals("MXN 1,000.00", money.toString());
     }
 }
