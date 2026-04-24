@@ -54,7 +54,7 @@ public final class Tax {
      */
     private BigDecimal normalize(BigDecimal rate) {
         return rate.setScale(SCALE_INTERNAL, RoundingMode.HALF_UP)
-                   .stripTrailingZeros();
+                .stripTrailingZeros();
     }
 
     /**
@@ -103,13 +103,23 @@ public final class Tax {
      */
     public BigDecimal asPercentage() {
         return rate.multiply(BigDecimal.valueOf(100))
-                   .setScale(2, RoundingMode.HALF_UP);
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public static Tax zero() {
+        return new Tax(BigDecimal.ZERO);
+    }
+
+    public boolean isZero() {
+        return rate.compareTo(BigDecimal.ZERO) == 0;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Tax)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Tax))
+            return false;
 
         Tax tax = (Tax) o;
         return rate.compareTo(tax.rate) == 0;
