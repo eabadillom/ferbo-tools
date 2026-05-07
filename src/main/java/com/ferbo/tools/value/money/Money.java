@@ -51,6 +51,15 @@ public final class Money implements Comparable<Money> {
     }
 
     /**
+     * Devuelve un objeto money con el valor inicial de zero
+     * @param currency
+     * @return Money
+     */
+    public static Money zero(Currency currency) {
+        return new Money(BigDecimal.ZERO, currency);
+    }
+
+    /**
      * Factory method principal.
      */
     public static Money of(BigDecimal amount, Currency currency) {
@@ -63,8 +72,7 @@ public final class Money implements Comparable<Money> {
     public static Money of(String amount, String currencyCode) {
         return new Money(
                 new BigDecimal(amount),
-                Currency.getInstance(currencyCode)
-        );
+                Currency.getInstance(currencyCode));
     }
 
     /**
@@ -182,8 +190,10 @@ public final class Money implements Comparable<Money> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Money)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Money))
+            return false;
 
         Money money = (Money) o;
 

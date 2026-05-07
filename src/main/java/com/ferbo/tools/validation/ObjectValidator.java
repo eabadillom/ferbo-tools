@@ -1,5 +1,7 @@
 package com.ferbo.tools.validation;
 
+import com.ferbo.tools.exception.ValidationException;
+
 /**
  * Utilidad para validar objetos en general.
  * 
@@ -25,5 +27,12 @@ public final class ObjectValidator {
         if (value == null) {
             notification.addError(field + " no debe ser nulo");
         }
+    }
+
+    public static <T> T notNull(T value, String field) {
+         if (value == null) {
+            throw new ValidationException(field + " es obligatorio");
+        }
+        return value;
     }
 }

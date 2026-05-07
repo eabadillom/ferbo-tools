@@ -3,11 +3,20 @@ package com.ferbo.tools.domain;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.junit.Test;
 
 public class AggregateRootTest {
+
+    static class TestEvent implements DomainEvent {
+
+        @Override
+        public Instant occurredAt() {
+            return Instant.now();
+        }
+    }
 
     static class TestAggregate extends AggregateRoot<Long> {
 
@@ -16,7 +25,7 @@ public class AggregateRootTest {
         }
 
         public void doSomething() {
-            registerEvent("EVENT");
+            registerEvent(new TestEvent());
         }
     }
 
@@ -26,10 +35,10 @@ public class AggregateRootTest {
 
         agg.doSomething();
 
-        List<Object> events = agg.getDomainEvents();
+        List<DomainEvent> events = agg.getDomainEvents();
 
         assertEquals(1, events.size());
-        assertEquals("EVENT", events.get(0));
+        assertTrue(events.get(0) instanceof TestEvent);
     }
 
     @Test
