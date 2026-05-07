@@ -6,7 +6,7 @@ Este proyecto sigue versionado semántico (SemVer) y el formato de [Keep a Chang
 
 ---
 
-## [0.9.0] - 2026-03-23
+## [0.1.0] - 07-05-2026
 
 ### Added
 - Microframework `emresa-tools` listo para uso interno.
@@ -23,7 +23,7 @@ Este proyecto sigue versionado semántico (SemVer) y el formato de [Keep a Chang
 - Las pruebas sirven como documentación viva del comportamiento esperado.
 
 ### Notes / Consideraciones
-- Esta versión es **pre-release (0.9.0)** y la API puede cambiar antes de la versión 1.0.0.
+- Esta versión es **pre-release (0.1.0)** y la API puede cambiar antes de la versión 1.0.0.
 - Se recomienda fijar versiones específicas en los proyectos internos que consuman el framework.
 - Futuras migraciones planificadas: soporte para Java 11+ y JUnit 5.
 
