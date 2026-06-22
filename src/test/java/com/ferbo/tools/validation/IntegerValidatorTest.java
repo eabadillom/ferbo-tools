@@ -6,60 +6,62 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.ferbo.tools.result.OperationResult;
-
 public class IntegerValidatorTest {
+
+    private Notification notification;
 
     @Test
     public void shouldReturnSuccessForValidValue() {
         IntegerValidator validator = new IntegerValidator(0, 10);
+        notification = new Notification();
 
-        OperationResult<Integer> result = validator.validate(5);
+        validator.validate(5, notification);
 
-        assertTrue(result.isSuccess());
-        assertEquals(Integer.valueOf(5), result.getData());
+        assertFalse(notification.hasErrors());
     }
 
     @Test
     public void shouldReturnFailureForNullValue() {
         IntegerValidator validator = new IntegerValidator(0, 10);
+        notification = new Notification();
 
-        OperationResult<Integer> result = validator.validate(null);
+        validator.validate(null, notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
-        assertEquals("El valor no puede ser nulo", result.getMessages().get(0).getBody());
+        assertTrue(notification.hasErrors());
+        assertEquals("El valor no puede ser nulo", notification.getErrors().get(0));
     }
 
     @Test
     public void shouldReturnFailureForBelowMin() {
-        IntegerValidator validator = new IntegerValidator(1, 10);
+        int min = 1;
+        IntegerValidator validator = new IntegerValidator(min, 10);
+        notification = new Notification();
 
-        OperationResult<Integer> result = validator.validate(0);
+        validator.validate(0, notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
-        assertTrue(result.getMessages().get(0).getBody().contains("menor que"));
+        assertTrue(notification.hasErrors());
+        assertTrue(notification.getErrors().get(0).contains("El valor no puede ser menor que " + min));
     }
 
     @Test
     public void shouldReturnFailureForAboveMax() {
-        IntegerValidator validator = new IntegerValidator(0, 10);
+        int max = 10;
+        IntegerValidator validator = new IntegerValidator(0, max);
+        notification = new Notification();
 
-        OperationResult<Integer> result = validator.validate(15);
+        validator.validate(15, notification);
 
-        assertFalse(result.isSuccess());
-        assertTrue(result.hasErrors());
-        assertTrue(result.getMessages().get(0).getBody().contains("mayor que"));
+        assertTrue(notification.hasErrors());
+        assertTrue(notification.getErrors().get(0).contains("El valor no puede ser mayor que " + max));
     }
 
     @Test
     public void shouldReturnSuccessWithoutRange() {
         IntegerValidator validator = new IntegerValidator();
+        notification = new Notification();
 
-        OperationResult<Integer> result = validator.validate(1000);
+        validator.validate(1000, notification);
 
-        assertTrue(result.isSuccess());
-        assertEquals(Integer.valueOf(1000), result.getData());
+        assertFalse(notification.hasErrors());
     }
 }

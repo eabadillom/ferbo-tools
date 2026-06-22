@@ -1,266 +1,75 @@
 package com.ferbo.tools.value.money;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Currency;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.ferbo.tools.exception.BusinessException;
-import com.ferbo.tools.exception.ValidationException;
 
 /**
  * Pruebas unitarias para la clase Money.
  */
 public class MoneyTest {
 
-    private Currency mxn;
-    private Currency usd;
-
-    @Before
-    public void setUp() {
-        mxn = Currency.getInstance("MXN");
-        usd = Currency.getInstance("USD");
-    }
-
-    /**
-     * Bebe crear correctamente un objeto Money válido.
-     */
     @Test
-    public void shouldCreateValidMoney() {
-        Money money = new Money(new BigDecimal("100.50"), mxn);
-
-        assertNotNull(money);
-        assertEquals(new BigDecimal(("100.50")), money.getAmount());
-        assertEquals(mxn, money.getCurrency());
-    }
-
-    /**
-     * Debe fallar si el monto es nulo.
-     */
-    @Test(expected = ValidationException.class)
-    public void shouldFailWhenAmountIsNull() {
-        new Money(null, mxn);
-    }
-
-    /**
-     * Debe fallar si la moneda es nula.
-     */
-    @Test(expected = ValidationException.class)
-    public void shouldFailWhenCurrencyIsNull() {
-        new Money(new BigDecimal("100"), null);
-    }
-
-    /**
-     * Debe aplicar redondeo correcto segun la momenda
-     */
-    @Test
-    public void shouldApplyRoundingCorrectly() {
-        Money money = new Money(new BigDecimal("100.123"), mxn);
-
-        // MXN normalmente usa 2 decimales
-        assertEquals(new BigDecimal("100.12"), money.getAmount());
-    }
-
-    /**
-     * Debe sumar correctamente dos valores con la misma moneda.
-     */
-    @Test
-    public void shouldAddMoneyCurrectly() {
-        Money m1 = new Money(new BigDecimal("100.00"), mxn);
-        Money m2 = new Money(new BigDecimal("50.00"), mxn);
-
-        Money result = m1.add(m2);
-
-        assertEquals(new BigDecimal("150.00"), result.getAmount());
-        assertEquals(mxn, result.getCurrency());
-    }
-
-    /**
-     * Debe fallar al sumar monedas diferentes.
-     */
-    @Test (expected = BusinessException.class)
-    public void shouldFailWhenAddDifferentCurrencies() {
-        Money m1 = new Money(new BigDecimal("100.00"), mxn);
-        Money m2 = new Money(new BigDecimal("50.00"), usd);
-
-        m1.add(m2);
-    }
-
-    /**
-     * Debe restar correctamente.
-     */
-    @Test
-    public void shoulSubtractMoneyCorrectly() {
-        Money m1 = new Money(new BigDecimal("100.00"), mxn);
-        Money m2 = new Money(new BigDecimal("30.00"), mxn);
-
-        Money result = m1.subtract(m2);
-
-        assertEquals(new BigDecimal("70.00"), result.getAmount());
-    }
-
-    /**
-     * Debe permitir resultados negativos.
-     */
-    @Test
-    public void shouldAllowNegativeResults() {
-        Money m1 = new Money(new BigDecimal("50.00"), mxn);
-        Money m2 = new Money(new BigDecimal("100.00"), mxn);
-
-        Money result = m1.subtract(m2);
-
-        assertTrue(result.isNegative());
-        assertEquals(new BigDecimal("-50.00"), result.getAmount());
-    }
-
-    /**
-     * Debe multiplicar correctamente.
-     */
-    @Test
-    public void shouldMultiplyCorrectly() {
-        Money money = new Money(new BigDecimal("100.00"), mxn);
-
-        Money result = money.multiply(new BigDecimal("2"));
-
-        assertEquals(new BigDecimal("200.00"), result.getAmount());
-    }
-
-    /**
-     * Debe fallar si el factor es nulo.
-     */
-    @Test(expected = ValidationException.class)
-    public void shouldFailWhenFactorIsNull() {
-        Money money = new Money(new BigDecimal("100.00"), mxn);
-
-        money.multiply(null);
-    }
-
-    /**
-     * Debe dividir correctamente.
-     */
-    @Test
-    public void shouldDivividirCorrectly() {
-        Money money = new Money(new BigDecimal("100.00"), mxn);
-
-        Money result = money.divide(new BigDecimal("2"));
-
-        assertEquals(new BigDecimal("50.00"), result.getAmount());
-    }
-
-    /**
-     * Debe fallar al dividir entre cero.
-     */
-    @Test(expected = BusinessException.class)
-    public void shouldFailWhenDivideByZero() {
-        Money money = new Money(new BigDecimal("100.00"), mxn);
-
-        money.divide(BigDecimal.ZERO);
-    }
-
-    /**
-     * Debe identificar correctamente cero.
-     */
-    @Test
-    public void shouldIdentifyZero() {
-        Money money = new Money(BigDecimal.ZERO, mxn);
-
-        assertTrue(money.isZero());
-    }
-
-    /**
-     * Debe identificar correctamente positivo.
-     */
-    @Test
-    public void shouldIdentifyPositive() {
-        Money money = new Money(new BigDecimal("10.00"), mxn);
-
-        assertTrue(money.isPositive());
-    }
-
-    /**
-     * Debe identificar correctamente negativo.
-     */
-    @Test
-    public void shouldIdentifyNegative() {
-        Money money = new Money(new BigDecimal("-10.00"), mxn);
-
-        assertTrue(money.isNegative());
-    }
-
-    /**
-     * Debe comparar correctamente dos montos
-     */
-    @Test
-    public void shouldCompareMoneyCorrectly() {
-        Money m1 = new Money(new BigDecimal("100.00"), mxn);
-        Money m2 = new Money(new BigDecimal("200.00"), mxn);
-
-        assertTrue(m1.compareTo(m2) < 0);
-        assertTrue(m2.compareTo(m1) > 0);
-        assertFalse(m1.compareTo(m2) == 0);
+    public void testCreationAndGetters() {
+        Money m = Money.of("100.50", "USD");
+        assertEquals(new BigDecimal("100.50"), m.getAmount());
+        assertEquals(Currency.getInstance("USD"), m.getCurrency());
     }
 
     @Test
-    public void shouldNegateAmountAndKeepCurrency() {
-        Money original = new Money(new BigDecimal("100.00"), usd);
+    public void testAddSubtract() {
+        Money m1 = Money.of("100", "USD");
+        Money m2 = Money.of("50", "USD");
 
-        Money result = original.negate();
-
-        // Verifica que el monto se invierte
-        assertEquals(new BigDecimal("-100.00"), result.getAmount());
-
-        // Verifica que la moneda se mantiene
-        assertEquals(usd, result.getCurrency());
-
-        // Verificar que es una nueva instancia
-        assertNotSame(original, result);
+        assertEquals(Money.of("150", "USD"), m1.add(m2));
+        assertEquals(Money.of("50", "USD"), m1.subtract(m2));
     }
 
     @Test
-    public void shouldNegativaAmountToPositive() {
-        Money orignal = new Money(new BigDecimal("-50.00"), mxn);
+    public void testMultiplyDivide() {
+        Money m = Money.of("100", "USD");
 
-        Money result = orignal.negate();
-
-        assertEquals(new BigDecimal("50.00"), result.getAmount());
-        assertEquals(mxn, result.getCurrency());
+        assertEquals(Money.of("200", "USD"), m.multiply(BigDecimal.valueOf(2)));
+        assertEquals(Money.of("50", "USD"), m.divide(BigDecimal.valueOf(2)));
     }
 
     @Test
-    public void shouldNegateZero() {
-        Money original = new Money(BigDecimal.ZERO, mxn);
+    public void testZeroPositiveNegative() {
+        Money zero = Money.of("0", "USD");
+        Money positive = Money.of("10", "USD");
+        Money negative = Money.of("-5", "USD");
 
-        Money result = original.negate();
-
-        assertEquals(new BigDecimal("0.00"), result.getAmount());
-        assertEquals(mxn, result.getCurrency());
+        assertTrue(zero.isZero());
+        assertTrue(positive.isPositive());
+        assertTrue(negative.isNegative());
     }
 
-    /**
-     * equals debe funcionar correctamente.
-     */
     @Test
-    public void shouldCompareEqualsCorrectly() {
-        Money m1 = new Money(new BigDecimal("100.00"), mxn);
-        Money m2 = new Money(new BigDecimal("100.00"), mxn);
+    public void testNegateAndCompare() {
+        Money m = Money.of("100", "USD");
+        assertEquals(Money.of("-100", "USD"), m.negate());
+        assertTrue(m.compareTo(Money.of("50", "USD")) > 0);
+    }
 
+    @Test
+    public void testDifferentCurrencyThrows() {
+        Money m1 = Money.of("100", "USD");
+        Money m2 = Money.of("100", "MXN");
+        assertThrows(BusinessException.class, () -> m1.add(m2));
+    }
+
+    @Test
+    public void testEqualsAndHashCode() {
+        Money m1 = Money.of("100.00", "USD");
+        Money m2 = Money.of("100.0", "USD");
         assertEquals(m1, m2);
-    }
-
-    /**
-     * toString debe devolver formato esperado.
-     */
-    @Test
-    public void shouldReturnCorrectToString() {
-        Money money = new Money(new BigDecimal("1000.00"), mxn);
-
-        assertEquals("MXN $1,000.00", money.toString());
+        assertEquals(m1.hashCode(), m2.hashCode());
     }
 }

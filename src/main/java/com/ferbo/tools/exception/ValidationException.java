@@ -5,7 +5,8 @@ package com.ferbo.tools.exception;
  * 
  * <p>
  * Se utiliza en los validadores del toolkit para señalar que algún valor
- * no cumple las reglas definidas, por ejemplo:
+ * no cumple las reglas definidas, además para ser utilizable para validaciones de reglas
+ * de negocio simples, por ejemplo:
  * </p>
  * 
  * <ul>
@@ -19,25 +20,21 @@ package com.ferbo.tools.exception;
  * uniforme.
  * </p>
  */
-public class ValidationException extends ToolException {
+public class ValidationException extends BusinessException {
 
-    /**
-     * Crea una excepción de validación con mensaje descriptivo.
-     * 
-     * @param message descripción del error de validación
-     */
     public ValidationException(String message) {
         super(message);
     }
 
-    /**
-     * Crea una excepción de validación con mensaje y causa.
-     * 
-     * @param message descripción del error
-     * @param cause excepción original
-     */
     public ValidationException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    public ValidationException(String code, String message) {
+        super(code, message);
+    }
+
+    public ValidationException(String code, String message, Throwable cause) {
+        super(code, message, cause);
+    }
 }

@@ -1,7 +1,6 @@
 package com.ferbo.tools.value.money;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Currency;
 import java.util.Objects;
 
@@ -10,15 +9,15 @@ import com.ferbo.tools.exception.ValidationException;
 
 /**
  * Value Object que representa una cantidad monetaria segura e inmutable.
- * Garantiza que el monto siempre tenga la escala correcta según la moneda.
- * 
+ *
  * Características:
  * - Inmutable
- * - Precio (usa BigDecimal)
+ * - Usa BigDecimal (precisión exacta)
  * - Seguro en operaciones
  * - Dependiente de la moneda
- * 
- * Permite Valores:
+ * - Usa estrategia de redondeo consistente
+ *
+ * Permite valores:
  * - Positivos
  * - Negativos
  * - Cero
@@ -27,23 +26,64 @@ public final class Money implements Comparable<Money> {
 
     private final BigDecimal amount;
     private final Currency currency;
+    private final RoundingStrategy roundingStrategy;
 
     /**
-     * Constructor principal.
-     * Aplica Validaciones y redondeo automático.
-     * 
-     * @param amount   Cantidad monetaria
-     * @param currency Moneda
+     * Constructor por defecto: usa rounding estándar.
      */
     public Money(BigDecimal amount, Currency currency) {
-        validate(amount, currency);
-
-        this.currency = currency;
-        this.amount = CurrencyUtils.round(amount, currency);
+        this(amount, currency, new StandardRoundingStrategy());
     }
 
     /**
-     * Método de validación interna.
+     * Constructor principal con estrategia de redondeo.
+     */
+    public Money(BigDecimal amount, Currency currency, RoundingStrategy roundingStrategy) {
+        validate(amount, currency);
+
+        if (roundingStrategy == null) {
+            throw new ValidationException("RoundingStrategy no puede ser nula");
+        }
+
+        this.currency = currency;
+        this.roundingStrategy = roundingStrategy;
+        this.amount = roundingStrategy.round(amount, currency);
+    }
+
+    /**
+     * Devuelve un objeto money con el valor inicial de zero
+     * @param currency
+     * @return Money
+     */
+    public static Money zero(Currency currency) {
+        return new Money(BigDecimal.ZERO, currency);
+    }
+
+    /**
+     * Factory method principal.
+     */
+    public static Money of(BigDecimal amount, Currency currency) {
+        return new Money(amount, currency);
+    }
+
+    /**
+     * Factory conveniente con String (evita problemas de double).
+     */
+    public static Money of(String amount, String currencyCode) {
+        return new Money(
+                new BigDecimal(amount),
+                Currency.getInstance(currencyCode));
+    }
+
+    /**
+     * Crea nueva instancia preservando currency y roundingStrategy.
+     */
+    private Money newInstance(BigDecimal newAmount) {
+        return new Money(newAmount, this.currency, this.roundingStrategy);
+    }
+
+    /**
+     * Validaciones básicas.
      */
     private void validate(BigDecimal amount, Currency currency) {
         if (amount == null) {
@@ -56,53 +96,42 @@ public final class Money implements Comparable<Money> {
     }
 
     /**
-     * Suma dos valores monetarios.
+     * Suma segura.
      */
     public Money add(Money other) {
         validateSameCurrency(other);
-        return new Money(this.amount.add(other.amount), this.currency);
+        return newInstance(this.amount.add(other.amount));
     }
 
     /**
-     * Resta dos valores monetarios.
+     * Resta segura.
      */
     public Money subtract(Money other) {
         validateSameCurrency(other);
-        return new Money(this.amount.subtract(other.amount), this.currency);
+        return newInstance(this.amount.subtract(other.amount));
     }
 
     /**
-     * Multiplica el monto por un factor.
+     * Multiplicación segura.
      */
     public Money multiply(BigDecimal factor) {
         if (factor == null) {
             throw new ValidationException("El factor no puede ser nulo");
         }
 
-        BigDecimal result = this.amount.multiply(factor);
-        return new Money(result, this.currency);
+        return newInstance(this.amount.multiply(factor));
     }
 
     /**
-     * Divide el monto por un divisor.
+     * División segura delegada a la estrategia de redondeo.
      */
     public Money divide(BigDecimal divisor) {
-        if (divisor == null) {
-            throw new ValidationException("El divisor no puede ser nulo");
-        }
-
-        if (BigDecimal.ZERO.compareTo(divisor) == 0) {
-            throw new BusinessException("No se puede dividir entre cero");
-        }
-
-        // Escala alta temporal para evitar pérdida de precisión
-        BigDecimal result = this.amount.divide(divisor, 10, RoundingMode.HALF_UP);
-
-        return new Money(result, this.currency);
+        BigDecimal result = roundingStrategy.divide(this.amount, divisor, this.currency);
+        return newInstance(result);
     }
 
     /**
-     * Valida que ambas monedas sean iguales.
+     * Validación de moneda.
      */
     private void validateSameCurrency(Money other) {
         if (other == null) {
@@ -114,62 +143,51 @@ public final class Money implements Comparable<Money> {
         }
     }
 
-    /**
-     * Compara dos valores monetarios.
-     */
     @Override
     public int compareTo(Money other) {
+        Objects.requireNonNull(other, "Money a comparar no puede ser null");
         validateSameCurrency(other);
         return this.amount.compareTo(other.amount);
     }
 
-    /**
-     * Obtiene el monto.
-     */
     public BigDecimal getAmount() {
         return amount;
     }
 
-    /**
-     * Obtiene la moneda
-     */
     public Currency getCurrency() {
         return currency;
     }
 
-    /**
-     * Indica si el valor es cero.
-     */
     public boolean isZero() {
-        return BigDecimal.ZERO.compareTo(this.amount) == 0;
+        return amount.signum() == 0;
     }
 
-    /**
-     * Indica si el valor es negativo.
-     */
     public boolean isNegative() {
-        return this.amount.signum() < 0;
+        return amount.signum() < 0;
     }
 
-    /**
-     * Indica si el valor es positivo.
-     */
     public boolean isPositive() {
-        return this.amount.signum() > 0;
+        return amount.signum() > 0;
     }
 
-    /**
-     * Devuelve una nueva instancia de Money con el monto negado,
-     * es decir, invierte el signo del valor (positivo a negativo y viceversa),
-     * manteniendo la misma moneda.
-     */
     public Money negate() {
-        return new Money(this.amount.negate(), this.currency);
+        return newInstance(this.amount.negate());
     }
 
     /**
-     * equals basado en monto y moneda.
+     * Valor absoluto.
      */
+    public Money abs() {
+        return isNegative() ? negate() : this;
+    }
+
+    /**
+     * Verifica si comparten moneda.
+     */
+    public boolean sameCurrency(Money other) {
+        return other != null && this.currency.equals(other.currency);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -179,22 +197,20 @@ public final class Money implements Comparable<Money> {
 
         Money money = (Money) o;
 
-        return amount.compareTo(money.amount) == 0 && currency.equals(money.currency);
+        return amount.compareTo(money.amount) == 0 &&
+                currency.equals(money.currency);
     }
 
-    /**
-     * hashCode consistente con equals.
-     */
     @Override
     public int hashCode() {
         return Objects.hash(amount.stripTrailingZeros(), currency);
     }
 
     /**
-     * Representación en texto.
+     * Representación técnica (NO UI).
      */
     @Override
     public String toString() {
-        return CurrencyUtils.format(this);
+        return MoneyFormatter.formatTechnical(this);
     }
 }
