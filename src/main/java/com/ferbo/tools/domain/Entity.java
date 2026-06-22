@@ -18,7 +18,7 @@ public abstract class Entity<ID> implements Identifiable<ID>, Serializable {
     /**
      * Identificador único de la entidad.
      */
-    protected final ID id;
+    protected ID id;
 
     /**
      * Constructor base. 
@@ -46,7 +46,7 @@ public abstract class Entity<ID> implements Identifiable<ID>, Serializable {
 
         Entity<?> entity = (Entity<?>) o;
 
-        return Objects.equals(id, entity.id);
+        return id != null && id.equals(entity.id);
     }
 
     /**

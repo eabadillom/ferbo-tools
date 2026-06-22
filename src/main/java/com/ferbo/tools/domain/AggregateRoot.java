@@ -3,8 +3,7 @@ package com.ferbo.tools.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.ferbo.tools.exception.ValidationException;
+import java.util.Objects;
 
 /**
  * Clase base abstracta para Aggregate Roots.
@@ -15,45 +14,44 @@ import com.ferbo.tools.exception.ValidationException;
  * </p>
  * 
  * <p>
- * Tambien puede registrar eventos de dominio que ocurren durante cambios de estado.
+ * Permite registrar eventos de dominio ocurridos durante cambios de estado.
  * </p>
  * 
- * @param <ID> tipo del identificador registrados.
+ * @param <ID> tipo del identificador
  */
 public abstract class AggregateRoot<ID> extends Entity<ID> {
 
-    /**
+     /**
      * Lista de eventos de dominio registrados.
      */
-    private final List<Object> domainEvents = new ArrayList<>();
+    private final List<DomainEvent> domainEvents = new ArrayList<>();
 
-    protected AggregateRoot (ID id) {
+    protected AggregateRoot(ID id) {
         super(id);
     }
 
     /**
      * Registra un evento de dominio.
-     * 
+     *
+     * <p>
+     * Solo debe ser usado dentro del agregado.
+     * </p>
+     *
      * @param event evento ocurrido
      */
-    protected void registerEvent(Object event) {
-        if (event == null) {
-            throw new ValidationException("El evento no puede ser nulo");
-        }
-        domainEvents.add(event);
+    protected void registerEvent(DomainEvent event) {
+        domainEvents.add(Objects.requireNonNull(event, "event no puede ser null"));
     }
 
     /**
-     * Devuelve una lista inmutable de eventos de dominio. 
-     * 
-     * @return lista de eventos
+     * Devuelve los eventos registrados (inmutable).
      */
-    public List<Object> getDomainEvents() {
+    public List<DomainEvent> getDomainEvents() {
         return Collections.unmodifiableList(domainEvents);
     }
 
     /**
-     * Limpia los eventos de dominio registrados.
+     * Limpia los eventos (usualmente después de publicarlos).
      */
     public void clearDomainEvents() {
         domainEvents.clear();

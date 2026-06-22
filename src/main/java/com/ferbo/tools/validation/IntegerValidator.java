@@ -1,9 +1,5 @@
 package com.ferbo.tools.validation;
 
-import com.ferbo.tools.result.MessageLevel;
-import com.ferbo.tools.result.OperationResult;
-import com.ferbo.tools.result.ResultBuilder;
-
 /**
  * Validador de números enteros.
  *
@@ -12,8 +8,6 @@ import com.ferbo.tools.result.ResultBuilder;
  * - valor mínimo
  * - valor máximo
  * </p>
- *
- * @param <T> tipo de dato a validar (Integer)
  */
 public class IntegerValidator implements Validator<Integer> {
 
@@ -39,22 +33,22 @@ public class IntegerValidator implements Validator<Integer> {
     }
 
     @Override
-    public OperationResult<Integer> validate(Integer target) {
-        ResultBuilder<Integer> builder = ResultBuilder.<Integer>success().data(target);
+    public void validate(Integer target, Notification notification) {
 
+        // Validación de nulo
         if (target == null) {
-            builder = ResultBuilder.<Integer>failure()
-                    .message(MessageLevel.ERROR, "Valor inválido", "El valor no puede ser nulo");
-        } else {
-            if (min != null && target < min) {
-                builder = ResultBuilder.<Integer>failure()
-                        .message(MessageLevel.ERROR, "Valor inválido", "El valor no puede ser menor que " + min);
-            } else if (max != null && target > max) {
-                builder = ResultBuilder.<Integer>failure()
-                        .message(MessageLevel.ERROR, "Valor inválido", "El valor no puede ser mayor que " + max);
-            }
+            notification.addError("El valor no puede ser nulo");
+            return;
         }
 
-        return builder.build();
+        // Validación de mínimo
+        if (min != null && target < min) {
+            notification.addError("El valor no puede ser menor que " + min);
+        }
+
+        // Validación de máximo
+        if (max != null && target > max) {
+            notification.addError("El valor no puede ser mayor que " + max);
+        }
     }
 }

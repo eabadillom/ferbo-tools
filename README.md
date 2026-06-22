@@ -106,7 +106,7 @@ OperationResult result = ResultBuilder.success().message("Operación exitosa").b
 
 ## Estado del proyecto
 
-**Versión actual:** 0.9.0 (pre-release)  
+**Versión actual:** 0.1.1
 API puede cambiar antes de la versión 1.0.0  
 Recomendado fijar versión específica en proyectos internos
 ---
