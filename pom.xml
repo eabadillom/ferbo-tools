@@ -7,7 +7,7 @@
   <groupId>com.ferbo</groupId>
   <artifactId>ferbo-tools</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.1-RELEASE</version>
   
   <name>Ferbo Tools</name>
   <description>Toolkit empresarial con utilidades comunes para desarrollo Java</description>
