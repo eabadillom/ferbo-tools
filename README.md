@@ -14,6 +14,7 @@ Ofrece herramientas para validación, manejo de errores, resultados de operació
 - **Programación funcional segura:** `ThrowingFunction`, `ThrowingSupplier`, `ThrowingConsumer`, `ThrowingRunnable` 
 - **Utilidades comunes:** Manejo de Strings, números y fechas 
 - **Soporte monetario:** `Money`, `Tax`, `CurrencyUtils`
+- **Manejo de flujos:** `IOTools`
 
 ---
 
@@ -34,7 +35,7 @@ src
 │ ├── result
 │ │ └── OperationResult, ResultBuilder
 │ ├── util
-│ │ └── [utilidades de fechas, strings, números]
+│ │ └── [utilidades de fechas, strings, números, flujos]
 │ ├── validation
 │ │ └── [validadores y Notification]
 │ └── value/money
@@ -56,9 +57,35 @@ src
 - Soporte planificado para Java 11+ y JUnit 5
 - Cambios mayores serán documentados en el CHANGELOG
 - Se notificará cualquier posible ruptura de compatibilidad
+
 ---
 
-## Ejemplos de uso
+## Manejo de flujos (`IOTools`)
+
+La clase `StreamUtils` provee métodos estáticos para convertir cadenas de texto (`String`) en flujos de entrada en memoria (`ByteArrayInputStream`), facilitando el envío de datos a otros procesos o librerías sin generar archivos temporales en disco.
+
+### Uso básico
+
+Por defecto, la conversión utiliza la codificación `UTF-8`:
+
+```java
+String datos = "Información a procesar con caracteres especiales (á, é, ñ)";
+InputStream stream = IOTools.toInputStream(datos);
+```
+
+Si el proceso consumidor requiere una codificación específica, puedes indicarla como segundo parámetro mediante `StandardCharsets`:
+
+```java
+InputStream streamIso = IOTools.toInputStream(datos, StandardCharsets.ISO_8859_1);
+```
+
+### Notas importantes
+* **Validación:** Ambos métodos lanzan una `IllegalArgumentException` si el texto o el `Charset` enviados son `null`.
+* **Consumo del flujo:** Cada `InputStream` generado se consume al leerse. Si necesitas pasar la misma información a múltiples procesos, genera una nueva instancia invocando nuevamente a `toInputStream()`.
+
+---
+
+## Ejemplos de uso de la biblioteca
 
 **Validación de texto:**
 ```Java
