@@ -1,93 +1,99 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-                             http://maven.apache.org/maven-v4_0_0.xsd">
-  
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.ferbo</groupId>
-  <artifactId>ferbo-tools</artifactId>
-  <packaging>jar</packaging>
-  <version>0.1.1-RELEASE</version>
-  
-  <name>Ferbo Tools</name>
-  <description>Toolkit empresarial con utilidades comunes para desarrollo Java</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ferbo</groupId>
+	<artifactId>ferbo-tools</artifactId>
+	<packaging>jar</packaging>
+	<version>0.2.0-SNAPSHOT</version>
 
-        <!-- Java -->
-        <java.version>1.8</java.version>
+	<name>Ferbo Tools</name>
+	<description>Toolkit empresarial con utilidades comunes para desarrollo Java</description>
 
-        <!-- Plugins -->
-        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- JUnit 5 -->
-        <junit.jupiter.version>5.10.0</junit.jupiter.version>
-    </properties>
+		<!-- Java -->
+		<java.version>1.8</java.version>
 
-    <dependencies>
+		<!-- Plugins -->
+		<maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+		<maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
 
-        <!-- JUnit 5 API para escribir tests -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<!-- JUnit 5 -->
+		<junit.jupiter.version>5.10.0</junit.jupiter.version>
+	</properties>
 
-        <!-- Motor de ejecución de JUnit 5 -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
+	<dependencies>
+		
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.25.5</version>
+		</dependency>
 
-        <!-- (Opcional) Para ejecutar tests antiguos de JUnit 4 dentro de JUnit 5 -->
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<!-- JUnit 5 API para escribir tests -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-    </dependencies>
+		<!-- Motor de ejecución de JUnit 5 -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-    <build>
-        <plugins>
+		<!-- (Opcional) Para ejecutar tests antiguos de JUnit 4 dentro de JUnit
+		5 -->
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-            <!-- Compilación Java -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
+	</dependencies>
 
-            <!-- Ejecución de tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.surefire.plugin.version}</version>
-                <configuration>
-                    <!-- Necesario para ejecutar JUnit 5 en Java 8 -->
-                    <useModulePath>false</useModulePath>
-                </configuration>
-            </plugin>
+	<build>
+		<plugins>
 
-        </plugins>
-    </build>
-    
-    <distributionManagement>
+			<!-- Compilación Java -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.plugin.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<!-- Ejecución de tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven.surefire.plugin.version}</version>
+				<configuration>
+					<!-- Necesario para ejecutar JUnit 5 en Java 8 -->
+					<useModulePath>false</useModulePath>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<distributionManagement>
 		<repository>
 			<id>github</id>
 			<name>GitHub eabadillom Apache Maven Packages</name>
 			<url>https://maven.pkg.github.com/eabadillom/ferbo-tools</url>
 		</repository>
 	</distributionManagement>
-    
+
 </project>
