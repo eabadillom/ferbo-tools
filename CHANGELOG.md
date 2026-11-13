@@ -5,6 +5,11 @@ Todos los cambios importantes en este proyecto serán documentados en este archi
 Este proyecto sigue versionado semántico (SemVer) y el formato de [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 
 ---
+## [0.2.0] - 13-11-2026
+
+### Added
+- Clase utilitaria `IOTools` con métodos estáticos para el cierre seguro de algunos Streams, además de la conversión en memoria de `String` o `byte[]` a `InputStream` (implementado mediante `ByteArrayInputStream`).
+- Soporte para codificación `UTF-8` por defecto y sobrecarga de método para especificar un `Charset` personalizado (`StandardCharsets`). 
 
 ## [0.1.1] - 07-05-2026
 
